@@ -1,0 +1,16 @@
+# Robots.txt for Kamadenu Goushala Platform
+User-agent: *
+Allow: /
+Allow: /assets/
+
+# Disallow Administrative and Internal Backend Framework
+Disallow: /admin/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /classes/
+Disallow: /services/
+Disallow: /ajax/
+Disallow: /database/
+
+# Sitemap Location
+Sitemap: http://localhost/kamadenu1/sitemap.php

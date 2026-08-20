@@ -1,0 +1,57 @@
+# ==============================================================================
+# KAMADENU GOUSHALA - APACHE CONFIGURATION & CLEAN URL REWRITING
+# ==============================================================================
+
+Options -Indexes +FollowSymLinks
+DirectoryIndex index.php index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /kamadenu1/
+
+    # Block access to hidden files and sensitive directories
+    RewriteRule ^(\.git|\.env|config|logs)/ - [F,L]
+
+    # Sitemap XML Rewrite
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+    # Serve existing files and directories directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Clean URL Rewriting for Core Pages
+    RewriteRule ^cows/?$ cows.php [L,QSA]
+    RewriteRule ^cows/([a-zA-Z0-9_-]+)/?$ cow-details.php?slug=$1 [L,QSA]
+    
+    RewriteRule ^breeds/?$ breeds.php [L,QSA]
+    RewriteRule ^breeds/([a-zA-Z0-9_-]+)/?$ breed-details.php?slug=$1 [L,QSA]
+    
+    RewriteRule ^seva/?$ seva.php [L,QSA]
+    RewriteRule ^seva/([a-zA-Z0-9_-]+)/?$ seva-details.php?slug=$1 [L,QSA]
+    RewriteRule ^feed/?$ feed.php [L,QSA]
+    RewriteRule ^adopt/?$ adopt.php [L,QSA]
+    RewriteRule ^sponsor/?$ sponsor.php [L,QSA]
+    RewriteRule ^donate/?$ donate.php [L,QSA]
+    RewriteRule ^transparency/?$ transparency.php [L,QSA]
+    
+    RewriteRule ^products/?$ products.php [L,QSA]
+    RewriteRule ^products/([a-zA-Z0-9_-]+)/?$ product-details.php?slug=$1 [L,QSA]
+    RewriteRule ^cart/?$ cart.php [L,QSA]
+    RewriteRule ^checkout/?$ checkout.php [L,QSA]
+    
+    RewriteRule ^gallery/?$ gallery.php [L,QSA]
+    RewriteRule ^videos/?$ videos.php [L,QSA]
+    RewriteRule ^blog/?$ blog.php [L,QSA]
+    RewriteRule ^blog/([a-zA-Z0-9_-]+)/?$ blog-details.php?slug=$1 [L,QSA]
+    RewriteRule ^contact/?$ contact.php [L,QSA]
+    RewriteRule ^about/?$ about.php [L,QSA]
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

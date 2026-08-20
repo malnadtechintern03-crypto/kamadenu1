@@ -1,0 +1,3 @@
+<?php
+// Static fallback XML sitemap generated from sitemap.php
+require_once __DIR__ . '/sitemap.php';
