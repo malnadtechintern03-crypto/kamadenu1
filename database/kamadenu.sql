@@ -532,17 +532,18 @@ CREATE TABLE `gallery` (
   `image_path` VARCHAR(255) NOT NULL,
   `caption` TEXT DEFAULT NULL,
   `display_order` INT DEFAULT 0,
+  `is_featured` TINYINT(1) DEFAULT 0,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`category_id`) REFERENCES `gallery_categories` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `gallery` (`category_id`, `title`, `image_path`, `caption`, `display_order`) VALUES
-(2, 'Morning Gomata Puja & Aarti', 'assets/images/gallery/morning_aarti.jpg', 'Daily sunrise prayers and flower offerings at Kamadenu Goushala.', 1),
-(1, 'Emergency Ambulance Rescue at Highway', 'assets/images/gallery/rescue_action.jpg', 'Our 24x7 ambulance team safely stabilizing an injured cow.', 2),
-(5, 'Sacred Gir Cows Grazing in Lush Pastures', 'assets/images/gallery/pasture_gir.jpg', 'Free-range joyful grazing in our 15-acre organic herbal sanctuary.', 3),
-(3, 'Gopashtami Grand Celebration', 'assets/images/gallery/gopashtami.jpg', 'Devotees and children offering jaggery and grass to mother cows.', 4),
-(4, 'Veterinary Health Checkup Camp', 'assets/images/gallery/medical_camp.jpg', 'Routine hoof trimming and probiotic nutrition assessment.', 5),
-(2, 'Fresh Green Fodder Distribution', 'assets/images/gallery/green_fodder.jpg', 'Nutritional organic fodder cultivated right inside our eco-farm.', 6);
+INSERT INTO `gallery` (`category_id`, `title`, `image_path`, `caption`, `display_order`, `is_featured`) VALUES
+(2, 'Morning Gomata Puja & Aarti', 'assets/images/gallery/morning_aarti.jpg', 'Daily sunrise prayers and flower offerings at Kamadenu Goushala.', 1, 1),
+(1, 'Emergency Ambulance Rescue at Highway', 'assets/images/gallery/rescue_action.jpg', 'Our 24x7 ambulance team safely stabilizing an injured cow.', 2, 1),
+(5, 'Sacred Gir Cows Grazing in Lush Pastures', 'assets/images/gallery/pasture_gir.jpg', 'Free-range joyful grazing in our 15-acre organic herbal sanctuary.', 3, 0),
+(3, 'Gopashtami Grand Celebration', 'assets/images/gallery/gopashtami.jpg', 'Devotees and children offering jaggery and grass to mother cows.', 4, 1),
+(4, 'Veterinary Health Checkup Camp', 'assets/images/gallery/medical_camp.jpg', 'Routine hoof trimming and probiotic nutrition assessment.', 5, 0),
+(2, 'Fresh Green Fodder Distribution', 'assets/images/gallery/green_fodder.jpg', 'Nutritional organic fodder cultivated right inside our eco-farm.', 6, 0);
 
 CREATE TABLE `videos` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

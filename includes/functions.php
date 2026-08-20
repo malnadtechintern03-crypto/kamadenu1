@@ -51,15 +51,30 @@ function image_url(
         return BASE_URL . '/assets/images/' . $fallback;
     }
 
-    $safeFilename = basename($filename);
-
-    $filePath = dirname(__DIR__) . '/uploads/' . $folder . '/' . $safeFilename;
-
-    if (!is_file($filePath)) {
-        return BASE_URL . '/assets/images/' . $fallback;
+    // Direct asset path: e.g. "assets/images/breeds/gir.jpg"
+    if (str_starts_with($filename, 'assets/')) {
+        $assetPath = dirname(__DIR__) . '/' . ltrim($filename, '/');
+        if (is_file($assetPath)) {
+            return BASE_URL . '/' . ltrim($filename, '/');
+        }
     }
 
-    return BASE_URL . '/uploads/' . $folder . '/' . rawurlencode($safeFilename);
+    $safeFilename = basename($filename);
+
+    // 1. Check in /uploads/{folder}/{filename}
+    $uploadPath = dirname(__DIR__) . '/uploads/' . $folder . '/' . $safeFilename;
+    if (is_file($uploadPath)) {
+        return BASE_URL . '/uploads/' . $folder . '/' . rawurlencode($safeFilename);
+    }
+
+    // 2. Check in /assets/images/{folder}/{filename}
+    $assetSubfolderPath = dirname(__DIR__) . '/assets/images/' . $folder . '/' . $safeFilename;
+    if (is_file($assetSubfolderPath)) {
+        return BASE_URL . '/assets/images/' . $folder . '/' . rawurlencode($safeFilename);
+    }
+
+    // 3. Fallback placeholder
+    return BASE_URL . '/assets/images/' . $fallback;
 }
 
 /**

@@ -44,9 +44,7 @@ function initGalleryTabs() {
           container.innerHTML = data.gallery.map((item, index) => `
             <div class="col-sm-6 col-lg-4 gallery-card-col">
               <div class="gallery-item cursor-pointer" onclick="openLightbox(${index})">
-                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-gold fs-1 bg-forest-subtle">
-                  <i class="bi bi-camera"></i>
-                </div>
+                <img src="${item.image_path}" alt="${item.title}" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='${window.location.origin}/kamadenu1/assets/images/placeholder-gallery.jpg';">
                 <div class="gallery-overlay">
                   <span class="badge bg-gold text-forest-dark mb-1 align-self-start small">${item.category_name}</span>
                   <h4 class="h6 text-white mb-0">${item.title}</h4>
@@ -102,10 +100,15 @@ function renderLightboxContent() {
   const titleEl = document.getElementById('lightboxTitle');
   const catEl = document.getElementById('lightboxCategory');
   const captionEl = document.getElementById('lightboxCaption');
+  const imgEl = document.getElementById('lightboxImg');
 
   if (titleEl) titleEl.textContent = item.title;
   if (catEl) catEl.textContent = item.category_name;
   if (captionEl) captionEl.textContent = item.caption || '';
+  if (imgEl && item.image_path) {
+    imgEl.src = item.image_path;
+    imgEl.alt = item.title;
+  }
 }
 
 function nextLightbox() {

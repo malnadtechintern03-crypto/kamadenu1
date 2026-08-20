@@ -50,12 +50,14 @@ $galleryItems = Database::fetchAll("
 
         <!-- Asymmetric Masonry Gallery Grid -->
         <div class="row g-4" id="galleryGridContainer">
-            <?php foreach ($galleryItems as $index => $item): ?>
+            <?php foreach ($galleryItems as $index => $item): 
+                $photoImgUrl = !empty($item['image_path'])
+                    ? (str_starts_with($item['image_path'], 'assets/') ? BASE_URL . '/' . ltrim($item['image_path'], '/') : image_url($item['image_path'], 'gallery', 'placeholder-gallery.jpg'))
+                    : BASE_URL . '/assets/images/placeholder-gallery.jpg';
+            ?>
             <div class="col-sm-6 col-lg-4 gallery-card-col">
                 <div class="gallery-item cursor-pointer" onclick="openLightbox(<?= $index; ?>)">
-                    <div class="w-100 h-100 d-flex align-items-center justify-content-center text-gold fs-1 bg-forest-subtle">
-                        <i class="bi bi-camera"></i>
-                    </div>
+                    <img src="<?= e($photoImgUrl); ?>" alt="<?= e($item['title']); ?>" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-gallery.jpg';">
                     <div class="gallery-overlay">
                         <span class="badge bg-gold text-forest-dark mb-1 align-self-start small"><?= e($item['category_name']); ?></span>
                         <h4 class="h6 text-white mb-0"><?= e($item['title']); ?></h4>
@@ -80,8 +82,8 @@ $galleryItems = Database::fetchAll("
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4 text-center">
-                <div class="rounded-3 bg-black bg-opacity-50 d-flex align-items-center justify-content-center mx-auto mb-3" style="min-height: 380px; max-height: 500px;">
-                    <i class="bi bi-flower1 display-1 text-gold"></i>
+                <div class="rounded-3 bg-black bg-opacity-50 d-flex align-items-center justify-content-center mx-auto mb-3 overflow-hidden" style="min-height: 300px; max-height: 480px;">
+                    <img src="" id="lightboxImg" class="w-100 h-100 object-fit-contain" alt="">
                 </div>
                 <h3 class="h4 font-serif text-cream mb-1" id="lightboxTitle">Goushala Moment</h3>
                 <p class="small text-cream opacity-75 mb-0" id="lightboxCaption">Description of the moment</p>
@@ -101,9 +103,13 @@ $galleryItems = Database::fetchAll("
 <script>
 // Initial payload for client lightbox
 currentGalleryList = <?= json_encode(array_map(function($i) {
+    $img = !empty($i['image_path'])
+        ? (str_starts_with($i['image_path'], 'assets/') ? BASE_URL . '/' . ltrim($i['image_path'], '/') : image_url($i['image_path'], 'gallery', 'placeholder-gallery.jpg'))
+        : BASE_URL . '/assets/images/placeholder-gallery.jpg';
     return [
         'id'            => $i['id'],
         'title'         => $i['title'],
+        'image_path'    => $img,
         'caption'       => $i['caption'] ?? '',
         'category_name' => $i['category_name']
     ];
