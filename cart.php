@@ -66,12 +66,14 @@ require_once __DIR__ . '/includes/header.php';
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($cart['items'] as $item): ?>
+                                    <?php foreach ($cart['items'] as $item): 
+                                        $cartImg = image_url($item['main_image'] ?? null, 'products', 'placeholder-product.jpg');
+                                    ?>
                                     <tr id="cartRow-<?= $item['product_id']; ?>">
                                         <td>
                                             <div class="d-flex align-items-center gap-3">
-                                                <div class="rounded-3 bg-forest-dark text-gold d-flex align-items-center justify-content-center flex-shrink-0" style="width: 54px; height: 54px; font-size: 1.3rem;">
-                                                    <i class="bi bi-flower1"></i>
+                                                <div class="rounded-3 border overflow-hidden flex-shrink-0" style="width: 54px; height: 54px; background: var(--color-forest-dark);">
+                                                    <img src="<?= e($cartImg); ?>" alt="<?= e($item['name']); ?>" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-product.jpg';">
                                                 </div>
                                                 <div>
                                                     <a href="<?= BASE_URL; ?>/product-details.php?slug=<?= e($item['slug']); ?>" class="fw-bold text-forest-dark text-decoration-none">

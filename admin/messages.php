@@ -5,9 +5,12 @@
 
 declare(strict_types=1);
 
-$pageTitle = 'Devotee Contact Messages & Inquiries';
+require_once dirname(__DIR__) . '/config/app.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 
-require_once __DIR__ . '/includes/header.php';
+require_role(['super_admin', 'admin', 'manager', 'editor', 'staff']);
+
+$currentUser = get_logged_in_user();
 
 // Handle Mark Read/Unread
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'toggle_read') {
@@ -21,6 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 $messages = Database::fetchAll("SELECT * FROM contact_messages ORDER BY created_at DESC");
+
+$pageTitle = 'Devotee Contact Messages & Inquiries';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="card p-4 rounded-4 border-0 shadow-sm bg-white mb-4">

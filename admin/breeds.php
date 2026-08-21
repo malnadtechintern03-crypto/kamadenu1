@@ -5,12 +5,13 @@
 
 declare(strict_types=1);
 
-$pageTitle = 'Indigenous Breeds Catalog';
-
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__) . '/config/app.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/services/UploadService.php';
 
-require_role(['super_admin', 'manager']);
+require_role(['super_admin', 'admin', 'manager']);
+
+$currentUser = get_logged_in_user();
 
 // Handle Add Breed
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add_breed') {
@@ -75,6 +76,9 @@ $breeds = Database::fetchAll("
     GROUP BY cb.id
     ORDER BY cb.id ASC
 ");
+
+$pageTitle = 'Indigenous Breeds Catalog';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">

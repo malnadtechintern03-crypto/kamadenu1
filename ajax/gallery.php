@@ -36,10 +36,14 @@ try {
 
     $gallery = [];
     foreach ($items as $item) {
+        $photoImgUrl = !empty($item['image_path'])
+            ? (str_starts_with($item['image_path'], 'assets/') ? BASE_URL . '/' . ltrim($item['image_path'], '/') : image_url($item['image_path'], 'gallery', 'placeholder-gallery.jpg'))
+            : BASE_URL . '/assets/images/placeholder-gallery.jpg';
+
         $gallery[] = [
             'id'            => $item['id'],
             'title'         => $item['title'],
-            'image_path'    => ASSETS_URL . '/' . ltrim($item['image_path'], '/'),
+            'image_path'    => $photoImgUrl,
             'caption'       => $item['caption'] ?? '',
             'category_name' => $item['category_name'],
             'category_slug' => $item['category_slug']

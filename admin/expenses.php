@@ -5,9 +5,12 @@
 
 declare(strict_types=1);
 
-$pageTitle = 'Operational Expenses & Procurement Log';
+require_once dirname(__DIR__) . '/config/app.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 
-require_once __DIR__ . '/includes/header.php';
+require_role(['super_admin', 'admin', 'manager']);
+
+$currentUser = get_logged_in_user();
 
 // Handle Add Expense
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -21,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $desc = sanitize_input($_POST['description'] ?? '');
 
     if ($catId > 0 && !empty($title) && $amount > 0) {
-        $currentUser = get_logged_in_user();
         Database::insert("
             INSERT INTO expenses (category_id, title, amount, expense_date, vendor_name, description, created_by, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
@@ -44,6 +46,9 @@ $expenses = Database::fetchAll("
 
 $categories = Database::fetchAll("SELECT * FROM expense_categories ORDER BY name ASC");
 $totalExp = array_sum(array_column($expenses, 'amount'));
+
+$pageTitle = 'Operational Expenses & Procurement Log';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="card p-4 rounded-4 border-0 shadow-sm bg-white mb-4">

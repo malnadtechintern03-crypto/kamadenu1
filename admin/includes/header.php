@@ -9,7 +9,7 @@ require_once dirname(__DIR__, 2) . '/config/app.php';
 require_once dirname(__DIR__, 2) . '/includes/auth.php';
 
 // Guard: Require Admin or Staff authentication
-require_role('admin', 'staff');
+require_role(['admin', 'super_admin', 'manager', 'editor', 'staff']);
 
 $currentUser = get_logged_in_user();
 $pageTitle = $pageTitle ?? 'Admin Dashboard';

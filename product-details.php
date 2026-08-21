@@ -61,10 +61,11 @@ $inStock = (int)$product['stock_quantity'] > 0;
             <!-- Left Column: Product Visuals -->
             <div class="col-lg-6">
                 <div class="card p-3 rounded-4 border-0 shadow-sm bg-cream mb-3">
+                    <?php
+                    $mainImg = image_url($product['main_image'] ?? null, 'products', 'placeholder-product.jpg');
+                    ?>
                     <div class="position-relative rounded-4 overflow-hidden" style="height: 400px; background-color: var(--color-forest-dark);">
-                        <div class="w-100 h-100 d-flex align-items-center justify-content-center text-gold display-1 bg-forest-subtle">
-                            <i class="bi bi-flower1"></i>
-                        </div>
+                        <img src="<?= e($mainImg); ?>" alt="<?= e($product['name']); ?>" id="mainProductImg" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-product.jpg';">
                         <?php if ($hasDiscount): ?>
                             <span class="position-absolute top-0 start-0 m-3 badge bg-danger text-white fs-6">
                                 SAVE <?= format_inr($saveAmount); ?>
@@ -74,6 +75,18 @@ $inStock = (int)$product['stock_quantity'] > 0;
                             SKU: <?= e($product['sku']); ?>
                         </span>
                     </div>
+
+                    <?php if (!empty($product['images']) && count($product['images']) > 1): ?>
+                    <div class="d-flex gap-2 mt-3 overflow-auto pb-1">
+                        <?php foreach ($product['images'] as $imgItem): 
+                            $thumbUrl = image_url($imgItem['image_path'], 'products', 'placeholder-product.jpg');
+                        ?>
+                        <button type="button" class="btn p-0 border rounded-3 overflow-hidden flex-shrink-0" style="width: 70px; height: 70px;" onclick="document.getElementById('mainProductImg').src='<?= e($thumbUrl); ?>'">
+                            <img src="<?= e($thumbUrl); ?>" class="w-100 h-100 object-fit-cover" alt="Thumbnail">
+                        </button>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
 
                 <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-cream-soft border small text-muted">

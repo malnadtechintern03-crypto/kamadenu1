@@ -5,9 +5,12 @@
 
 declare(strict_types=1);
 
-$pageTitle = 'Manage Customer Store Orders';
+require_once dirname(__DIR__) . '/config/app.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 
-require_once __DIR__ . '/includes/header.php';
+require_role(['super_admin', 'admin', 'manager']);
+
+$currentUser = get_logged_in_user();
 
 // Handle Quick Order Status Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_status') {
@@ -39,6 +42,9 @@ $orders = Database::fetchAll("
     WHERE {$whereClause} 
     ORDER BY o.created_at DESC
 ", $params);
+
+$pageTitle = 'Manage Customer Store Orders';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="card p-4 rounded-4 border-0 shadow-sm bg-white mb-4">

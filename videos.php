@@ -30,15 +30,24 @@ $videos = Database::fetchAll("SELECT * FROM videos ORDER BY display_order ASC, i
 <section class="py-5 bg-cream-soft">
     <div class="container py-3">
         <div class="row g-4">
-            <?php foreach ($videos as $v): ?>
+            <?php foreach ($videos as $v): 
+                $vThumb = $v['thumbnail'] ?? '';
+                if (empty($vThumb)) {
+                    $vThumb = !empty($v['youtube_video_id']) 
+                        ? "https://img.youtube.com/vi/{$v['youtube_video_id']}/hqdefault.jpg" 
+                        : BASE_URL . '/assets/images/placeholder-gallery.jpg';
+                } elseif (str_starts_with($vThumb, 'assets/')) {
+                    $vThumb = BASE_URL . '/' . ltrim($vThumb, '/');
+                } elseif (!str_starts_with($vThumb, 'http')) {
+                    $vThumb = image_url($vThumb, 'videos', 'placeholder-gallery.jpg');
+                }
+            ?>
             <div class="col-md-6 col-lg-4">
                 <div class="heritage-card h-100 d-flex flex-column">
                     
                     <!-- Video Card Thumbnail with Play Button -->
-                    <div class="position-relative cursor-pointer video-thumb-box" style="height: 220px; background-color: var(--color-forest-dark);" onclick="openVideoPlayer('<?= e($v['youtube_video_id']); ?>', '<?= e(addslashes($v['title'])); ?>')">
-                        <div class="w-100 h-100 d-flex align-items-center justify-content-center text-gold fs-1 bg-forest-subtle">
-                            <i class="bi bi-youtube"></i>
-                        </div>
+                    <div class="position-relative cursor-pointer video-thumb-box overflow-hidden" style="height: 220px; background-color: var(--color-forest-dark);" onclick="openVideoPlayer('<?= e($v['youtube_video_id']); ?>', '<?= e(addslashes($v['title'])); ?>')">
+                        <img src="<?= e($vThumb); ?>" alt="<?= e($v['title']); ?>" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='https://img.youtube.com/vi/<?= e($v['youtube_video_id']); ?>/hqdefault.jpg';">
                         
                         <!-- Play Icon Circle Overlay -->
                         <div class="position-absolute top-50 start-50 translate-middle">

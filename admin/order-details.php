@@ -8,6 +8,10 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config/app.php';
 require_once dirname(__DIR__) . '/includes/auth.php';
 
+require_role(['super_admin', 'admin', 'manager']);
+
+$currentUser = get_logged_in_user();
+
 $orderId = (int)($_GET['id'] ?? 0);
 $order = Database::fetchOne("
     SELECT o.*, c.name AS customer_name, c.email AS customer_email, c.phone AS customer_phone,

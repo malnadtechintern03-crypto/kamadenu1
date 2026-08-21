@@ -5,9 +5,12 @@
 
 declare(strict_types=1);
 
-$pageTitle = 'Sanctuary Vaccination & Immunization Tracker';
+require_once dirname(__DIR__) . '/config/app.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 
-require_once __DIR__ . '/includes/header.php';
+require_role(['super_admin', 'admin', 'manager', 'editor', 'staff']);
+
+$currentUser = get_logged_in_user();
 
 // Handle Add Vaccination Record
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -44,6 +47,9 @@ $vaccines = Database::fetchAll("
 ");
 
 $cows = Database::fetchAll("SELECT id, cow_code, name FROM cows WHERE status != 'deceased' ORDER BY name ASC");
+
+$pageTitle = 'Sanctuary Vaccination & Immunization Tracker';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="card p-4 rounded-4 border-0 shadow-sm bg-white mb-4">

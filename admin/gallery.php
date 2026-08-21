@@ -5,12 +5,13 @@
 
 declare(strict_types=1);
 
-$pageTitle = 'Gallery & Events Manager';
-
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__) . '/config/app.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/services/UploadService.php';
 
-require_role(['super_admin', 'manager', 'editor']);
+require_role(['super_admin', 'admin', 'manager', 'editor']);
+
+$currentUser = get_logged_in_user();
 
 $categories = Database::fetchAll("SELECT * FROM gallery_categories ORDER BY name ASC");
 
@@ -128,6 +129,9 @@ $photos = Database::fetchAll("
     {$whereSql}
     ORDER BY g.display_order ASC, g.id DESC
 ");
+
+$pageTitle = 'Gallery & Events Manager';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">

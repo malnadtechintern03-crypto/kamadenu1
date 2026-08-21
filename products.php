@@ -117,13 +117,12 @@ $cart = Order::getCart();
                     $hasDiscount = !empty($p['discount_price']) && $p['discount_price'] < $p['price'];
                     $effectivePrice = $hasDiscount ? (float)$p['discount_price'] : (float)$p['price'];
                     $saveAmount = $hasDiscount ? ($p['price'] - $p['discount_price']) : 0;
+                    $prodImg = image_url($p['main_image'] ?? null, 'products', 'placeholder-product.jpg');
                 ?>
                 <div class="col-sm-6 col-lg-3">
                     <div class="heritage-card h-100 d-flex flex-column">
-                        <div class="position-relative" style="height: 200px; background-color: var(--color-forest-dark);">
-                            <div class="w-100 h-100 d-flex align-items-center justify-content-center text-gold fs-1 bg-forest-subtle">
-                                <i class="bi bi-flower1"></i>
-                            </div>
+                        <div class="position-relative overflow-hidden" style="height: 200px; background-color: var(--color-forest-dark);">
+                            <img src="<?= e($prodImg); ?>" alt="<?= e($p['name']); ?>" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-product.jpg';">
                             <?php if ($hasDiscount): ?>
                                 <span class="position-absolute top-0 start-0 m-3 badge bg-danger text-white small">
                                     SAVE <?= format_inr($saveAmount); ?>

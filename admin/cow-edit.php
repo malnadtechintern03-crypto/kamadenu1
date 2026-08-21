@@ -9,13 +9,12 @@ require_once dirname(__DIR__) . '/config/app.php';
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/services/UploadService.php';
 
-require_role(['super_admin', 'manager']);
+require_role(['super_admin', 'admin', 'manager']);
 
+$currentUser = get_logged_in_user();
 $cowId = (int)($_GET['id'] ?? 0);
 $isEditing = $cowId > 0;
 $pageTitle = $isEditing ? 'Edit Cow Record' : 'Register New Rescued Cow';
-
-require_once __DIR__ . '/includes/header.php';
 
 $cow = null;
 if ($isEditing) {
@@ -103,6 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="row justify-content-center">

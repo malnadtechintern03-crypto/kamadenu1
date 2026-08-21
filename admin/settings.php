@@ -5,12 +5,13 @@
 
 declare(strict_types=1);
 
-$pageTitle = 'Sanctuary Configuration & Platform Settings';
-
-require_once __DIR__ . '/includes/header.php';
+require_once dirname(__DIR__) . '/config/app.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/services/UploadService.php';
 
-require_role(['super_admin']);
+require_role(['super_admin', 'admin']);
+
+$currentUser = get_logged_in_user();
 
 // Handle Settings Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -54,6 +55,9 @@ $settingsMap = [];
 foreach ($allSettings as $st) {
     $settingsMap[$st['setting_key']] = $st['setting_value'];
 }
+
+$pageTitle = 'Sanctuary Configuration & Platform Settings';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="card p-4 p-md-5 rounded-4 border-0 shadow-sm bg-white mb-4">

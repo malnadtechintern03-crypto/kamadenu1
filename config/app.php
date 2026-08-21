@@ -5,6 +5,11 @@
 
 declare(strict_types=1);
 
+// Enable Output Buffering
+if (!ob_get_level()) {
+    ob_start();
+}
+
 // Application Constants
 defined('KAMADENU_ROOT') || define('KAMADENU_ROOT', dirname(__DIR__));
 defined('APP_NAME') || define('APP_NAME', 'Kamadenu Goushala');

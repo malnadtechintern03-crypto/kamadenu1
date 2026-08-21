@@ -5,9 +5,10 @@
 
 declare(strict_types=1);
 
-$pageTitle = 'Manage Sanctuary Cows Directory';
+require_once dirname(__DIR__) . '/config/app.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 
-require_once __DIR__ . '/includes/header.php';
+require_role(['super_admin', 'admin', 'manager', 'editor', 'staff']);
 
 // Handle Delete Request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
@@ -53,6 +54,9 @@ $cows = Database::fetchAll("
 ", $params);
 
 $breeds = Breed::getAllWithCount();
+
+$pageTitle = 'Manage Sanctuary Cows Directory';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="card p-4 rounded-4 border-0 shadow-sm bg-white mb-4">

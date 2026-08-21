@@ -455,6 +455,10 @@ CREATE TABLE `product_images` (
   FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+INSERT INTO `product_images` (`product_id`, `image_path`, `display_order`) VALUES
+(1, 'assets/images/products/ghee_500.jpg', 1),
+(2, 'assets/images/products/ghee_1000.jpg', 1);
+
 CREATE TABLE `customers` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(120) NOT NULL,
