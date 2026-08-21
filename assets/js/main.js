@@ -5,10 +5,31 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initStickyNavbar();
+  initMobileNav();
   initAnimatedCounters();
   initSmoothScroll();
   initTooltips();
 });
+
+/**
+ * Mobile Navigation Drawer Utilities
+ */
+function initMobileNav() {
+  const mobileDrawer = document.getElementById('mobileMenuDrawer');
+  if (!mobileDrawer) return;
+
+  // Auto-close offcanvas on internal navigation link clicks
+  mobileDrawer.querySelectorAll('a[href]:not([data-bs-toggle="collapse"])').forEach(link => {
+    link.addEventListener('click', () => {
+      if (typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
+        const bsOffcanvas = bootstrap.Offcanvas.getInstance(mobileDrawer);
+        if (bsOffcanvas) {
+          bsOffcanvas.hide();
+        }
+      }
+    });
+  });
+}
 
 /**
  * Sticky Navbar Header Observer

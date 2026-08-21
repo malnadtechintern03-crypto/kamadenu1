@@ -35,7 +35,7 @@ function initGalleryTabs() {
       `;
 
       try {
-        const url = `${window.location.origin}/kamadenu1/ajax/gallery.php?category=${encodeURIComponent(catSlug)}`;
+        const url = `ajax/gallery.php?category=${encodeURIComponent(catSlug)}`;
         const res = await fetch(url);
         const data = await res.json();
 
@@ -44,7 +44,7 @@ function initGalleryTabs() {
           container.innerHTML = data.gallery.map((item, index) => `
             <div class="col-sm-6 col-lg-4 gallery-card-col">
               <div class="gallery-item cursor-pointer" onclick="openLightbox(${index})">
-                <img src="${item.image_path}" alt="${item.title}" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='${window.location.origin}/kamadenu1/assets/images/placeholder-gallery.jpg';">
+                <img src="${item.image_path}" alt="${item.title}" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='assets/images/placeholder-gallery.jpg';">
                 <div class="gallery-overlay">
                   <span class="badge bg-gold text-forest-dark mb-1 align-self-start small">${item.category_name}</span>
                   <h4 class="h6 text-white mb-0">${item.title}</h4>

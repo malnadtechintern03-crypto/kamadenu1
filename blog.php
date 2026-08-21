@@ -119,11 +119,19 @@ $categories = Database::fetchAll("
             </div>
         <?php else: ?>
             <div class="row g-4">
-                <?php foreach ($posts as $p): ?>
+                <?php foreach ($posts as $p):
+                    $blogImg = image_url($p['featured_image'] ?? null, 'blog', 'placeholder-blog.jpg');
+                ?>
                 <div class="col-md-6 col-lg-4">
                     <div class="heritage-card h-100 d-flex flex-column">
                         <div class="blog-card-img">
-                            <i class="bi bi-journal-text"></i>
+                            <img
+                                src="<?= e($blogImg); ?>"
+                                alt="<?= e($p['title']); ?>"
+                                class="w-100 h-100 object-fit-cover d-block"
+                                loading="lazy"
+                                onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-blog.jpg';"
+                            >
                         </div>
 
                         <div class="heritage-card-inner d-flex flex-column flex-grow-1">

@@ -476,11 +476,19 @@ try {
         </div>
 
         <div class="row g-4">
-            <?php foreach ($recentStories as $story): ?>
+            <?php foreach ($recentStories as $story):
+                $storyImg = image_url($story['featured_image'] ?? null, 'blog', 'placeholder-blog.jpg');
+            ?>
             <div class="col-md-6 col-lg-4">
                 <div class="heritage-card h-100 d-flex flex-column">
                     <div class="blog-card-img">
-                        <i class="bi bi-image"></i>
+                        <img
+                            src="<?= e($storyImg); ?>"
+                            alt="<?= e($story['title']); ?>"
+                            class="w-100 h-100 object-fit-cover d-block"
+                            loading="lazy"
+                            onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-blog.jpg';"
+                        >
                     </div>
                     <div class="heritage-card-inner d-flex flex-column flex-grow-1">
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -519,12 +527,20 @@ try {
         </div>
 
         <div class="row g-3">
-            <?php foreach ($galleryItems as $item): ?>
+            <?php foreach ($galleryItems as $item):
+                $galleryImg = !empty($item['image_path'])
+                    ? (str_starts_with($item['image_path'], 'assets/') ? BASE_URL . '/' . ltrim($item['image_path'], '/') : image_url($item['image_path'], 'gallery', 'placeholder-gallery.jpg'))
+                    : BASE_URL . '/assets/images/placeholder-gallery.jpg';
+            ?>
             <div class="col-sm-6 col-lg-4">
                 <div class="gallery-item">
-                    <div class="w-100 h-100 d-flex align-items-center justify-content-center text-gold fs-1 bg-forest-subtle">
-                        <i class="bi bi-camera"></i>
-                    </div>
+                    <img
+                        src="<?= e($galleryImg); ?>"
+                        alt="<?= e($item['title']); ?>"
+                        class="w-100 h-100 object-fit-cover d-block"
+                        loading="lazy"
+                        onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-gallery.jpg';"
+                    >
                     <div class="gallery-overlay">
                         <span class="badge bg-gold text-forest-dark mb-1 align-self-start small"><?= e($item['category_name']); ?></span>
                         <h4 class="h6 text-white mb-0"><?= e($item['title']); ?></h4>

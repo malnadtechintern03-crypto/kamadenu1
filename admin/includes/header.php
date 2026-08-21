@@ -38,8 +38,8 @@ $pageTitle = $pageTitle ?? 'Admin Dashboard';
             --admin-sidebar-width: 260px;
         }
         body {
-            background-color: #F8F9FA;
-            font-family: var(--font-body);
+            background-color: #F0F4FA;
+            font-family: var(--font-sans);
         }
         .admin-sidebar {
             width: var(--admin-sidebar-width);

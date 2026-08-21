@@ -54,12 +54,19 @@ $seniorCows = Database::fetchAll("
                             default          => 'badge-health-recovering'
                         };
                     ?>
+                    <?php
+                        $cowImage = image_url($cow['main_image'] ?? null, 'cows', 'placeholder-cow.jpg');
+                    ?>
                     <div class="col-md-6">
                         <div class="heritage-card h-100 d-flex flex-column">
-                            <div class="position-relative" style="height: 180px; background-color: var(--color-forest-dark);">
-                                <div class="w-100 h-100 d-flex align-items-center justify-content-center text-gold fs-1 bg-forest-subtle">
-                                    <i class="bi bi-flower1"></i>
-                                </div>
+                            <div class="position-relative" style="height: 180px; overflow: hidden;">
+                                <img
+                                    src="<?= e($cowImage); ?>"
+                                    alt="<?= e($cow['name']); ?>"
+                                    class="w-100 h-100 object-fit-cover d-block"
+                                    loading="lazy"
+                                    onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-cow.jpg';"
+                                >
                                 <span class="position-absolute top-0 end-0 m-3 badge <?= $healthClass; ?> badge-heritage">
                                     <?= ucfirst(str_replace('_', ' ', $cow['health_status'])); ?>
                                 </span>

@@ -45,35 +45,40 @@ function image_url(
     string $folder,
     string $fallback = 'placeholder.jpg'
 ): string {
+    // Trim whitespace and ensure we have a string
     $filename = trim((string)$filename);
 
+    // If no filename supplied, return fallback placeholder from assets
     if ($filename === '') {
         return BASE_URL . '/assets/images/' . $fallback;
     }
 
-    // Direct asset path: e.g. "assets/images/breeds/gir.jpg"
-    if (str_starts_with($filename, 'assets/')) {
-        $assetPath = dirname(__DIR__) . '/' . ltrim($filename, '/');
-        if (is_file($assetPath)) {
+    // If the stored filename already includes a path prefix (uploads/ or assets/),
+    // we can use it directly – this covers cases where the DB stores the full
+    // relative path instead of just the bare filename.
+    if (str_starts_with($filename, 'uploads/') || str_starts_with($filename, 'assets/')) {
+        $fullPath = dirname(__DIR__) . '/' . ltrim($filename, '/');
+        if (is_file($fullPath)) {
             return BASE_URL . '/' . ltrim($filename, '/');
         }
     }
 
+    // At this point we only have a plain filename; construct a safe filename.
     $safeFilename = basename($filename);
 
-    // 1. Check in /uploads/{folder}/{filename}
+    // 1️⃣ Try the expected upload folder: /uploads/{folder}/{filename}
     $uploadPath = dirname(__DIR__) . '/uploads/' . $folder . '/' . $safeFilename;
     if (is_file($uploadPath)) {
         return BASE_URL . '/uploads/' . $folder . '/' . rawurlencode($safeFilename);
     }
 
-    // 2. Check in /assets/images/{folder}/{filename}
+    // 2️⃣ Fallback to assets sub‑folder: /assets/images/{folder}/{filename}
     $assetSubfolderPath = dirname(__DIR__) . '/assets/images/' . $folder . '/' . $safeFilename;
     if (is_file($assetSubfolderPath)) {
         return BASE_URL . '/assets/images/' . $folder . '/' . rawurlencode($safeFilename);
     }
 
-    // 3. Fallback placeholder
+    // 3️⃣ If everything fails, serve the generic placeholder image.
     return BASE_URL . '/assets/images/' . $fallback;
 }
 

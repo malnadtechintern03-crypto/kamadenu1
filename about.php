@@ -13,6 +13,14 @@ require_once __DIR__ . '/includes/header.php';
 
 <!-- Page Hero -->
 <section class="page-hero">
+    <div class="page-hero-bg">
+        <img
+            src="<?= BASE_URL; ?>/assets/images/about-goushala.jpg"
+            alt="Our Sacred Mission & Heritage"
+            onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/hero-cow.jpg';"
+        >
+        <div class="page-hero-bg-overlay"></div>
+    </div>
     <div class="container text-center">
         <span class="badge bg-gold-subtle text-gold px-3 py-1 rounded-pill mb-2 border border-warning border-opacity-50">
             <i class="bi bi-flower1 me-1"></i> Gāvo Viśvasya Mātaraḥ (Cows are the Mothers of the Universe)
@@ -59,6 +67,7 @@ require_once __DIR__ . '/includes/header.php';
                         alt="Kamadenu Goushala sanctuary"
                         class="img-fluid rounded-5 shadow-lg w-100"
                         loading="lazy"
+                        onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/hero-cow.jpg';"
                     >
                 </div>
                 <div class="heritage-card p-4 bg-forest-dark text-white rounded-4 border-warning">
