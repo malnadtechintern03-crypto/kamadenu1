@@ -58,20 +58,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= ASSETS_URL; ?>/css/style.css">
 </head>
-<body class="bg-forest-dark min-vh-100 d-flex align-items-center justify-content-center py-5">
+<body class="min-vh-100 d-flex align-items-center justify-content-center py-5" style="background: linear-gradient(135deg, #102F32 0%, #1F5257 100%);">
 
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-4">
             
-            <div class="card p-4 p-md-5 rounded-4 shadow-lg border-0 bg-white position-relative">
+            <div class="card p-4 p-md-5 rounded-4 shadow-lg border bg-white position-relative" style="border-color: var(--color-border) !important; box-shadow: 0 8px 30px rgba(16, 47, 50, 0.20) !important;">
                 
                 <!-- Brand Emblem -->
                 <div class="text-center mb-4">
-                    <div class="navbar-brand-logo mx-auto mb-2" style="width:58px;height:58px;font-size:1.8rem;">
-                        <i class="bi bi-shield-lock-fill text-gold"></i>
+                    <div class="navbar-brand-logo mx-auto mb-2" style="width:58px;height:58px;font-size:1.8rem;background:rgba(233,120,58,0.12);border-radius:50%;">
+                        <i class="bi bi-shield-lock-fill text-saffron"></i>
                     </div>
-                    <h1 class="h4 font-serif text-forest-dark mb-1">Sanctuary Admin</h1>
+                    <h1 class="h4 font-serif text-royal-teal mb-1">Sanctuary Admin</h1>
                     <p class="text-muted small mb-0">Kamadenu Goushala Operations Portal</p>
                 </div>
 

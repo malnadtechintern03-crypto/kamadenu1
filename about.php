@@ -15,7 +15,7 @@ require_once __DIR__ . '/includes/header.php';
 <section class="page-hero">
     <div class="page-hero-bg">
         <img
-            src="<?= BASE_URL; ?>/assets/images/about-goushala.jpg"
+            src="<?= BASE_URL; ?>/assets/images/about-page-hero.jpg"
             alt="Our Sacred Mission & Heritage"
             onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/hero-cow.jpg';"
         >
@@ -133,7 +133,7 @@ require_once __DIR__ . '/includes/header.php';
 
             <div class="col-md-6 col-lg-3">
                 <div class="feature-box">
-                    <div class="stat-icon-wrapper mb-3" style="background:rgba(214,154,58,0.15);color:var(--color-gold-dark);">
+                    <div class="stat-icon-wrapper mb-3" style="background:rgba(233,120,58,0.14);color:var(--color-accent);">
                         <i class="bi bi-bandaid"></i>
                     </div>
                     <h3 class="h5 font-serif text-forest-dark mb-2">Veterinary Hospital</h3>
@@ -145,7 +145,7 @@ require_once __DIR__ . '/includes/header.php';
 
             <div class="col-md-6 col-lg-3">
                 <div class="feature-box">
-                    <div class="stat-icon-wrapper mb-3" style="background:rgba(139,94,60,0.12);color:var(--color-earth);">
+                    <div class="stat-icon-wrapper mb-3" style="background:rgba(95,168,168,0.15);color:var(--color-highlight);">
                         <i class="bi bi-shield-heart"></i>
                     </div>
                     <h3 class="h5 font-serif text-forest-dark mb-2">Senior Cow Hospice</h3>
@@ -195,7 +195,7 @@ require_once __DIR__ . '/includes/header.php';
 
             <div class="col-md-6 col-lg-4">
                 <div class="heritage-card text-center p-4 h-100">
-                    <div class="testimonial-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;background:rgba(214,154,58,0.15);color:var(--color-gold-dark);">
+                    <div class="testimonial-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;background:rgba(233,120,58,0.14);color:var(--color-accent);border-color:var(--color-accent);">
                         N
                     </div>
                     <h3 class="h5 font-serif text-forest-dark mb-1">Dr. H. V. Narayana</h3>
@@ -208,7 +208,7 @@ require_once __DIR__ . '/includes/header.php';
 
             <div class="col-md-6 col-lg-4">
                 <div class="heritage-card text-center p-4 h-100">
-                    <div class="testimonial-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;background:rgba(139,94,60,0.12);color:var(--color-earth);">
+                    <div class="testimonial-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;background:rgba(95,168,168,0.15);color:var(--color-highlight);border-color:var(--color-highlight);">
                         P
                     </div>
                     <h3 class="h5 font-serif text-forest-dark mb-1">Ramesh Patel</h3>

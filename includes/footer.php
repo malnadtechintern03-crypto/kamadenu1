@@ -106,7 +106,14 @@ declare(strict_types=1);
             </div>
         </div>
     </div>
-</footer>
+<!-- Floating WhatsApp Action Widget (Available on All Pages) -->
+<a href="https://wa.me/<?= preg_replace('/\D/', '', get_setting('site_whatsapp', '919845012345')); ?>" 
+   class="floating-whatsapp-btn" 
+   target="_blank" 
+   rel="noopener" 
+   title="Chat with Seva Desk on WhatsApp">
+    <i class="bi bi-whatsapp"></i>
+</a>
 
 <!-- Bootstrap 5.3 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

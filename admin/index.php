@@ -51,9 +51,12 @@ $recentMessages = Database::fetchAll("
 $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
 ?>
 
-<!-- Sanctuary Overview Welcome Card with Kamadhenu Image -->
+<!-- Sanctuary Overview Welcome Card with Grand Particles & Live Ticker -->
 <div class="card border-0 rounded-4 shadow-sm overflow-hidden mb-4 bg-forest-dark text-white position-relative">
-    <div class="row g-0 align-items-center">
+    <!-- Golden Particles Canvas Layer -->
+    <canvas id="adminHeroParticles" class="hero-particles-layer" style="opacity: 0.55;"></canvas>
+
+    <div class="row g-0 align-items-center position-relative" style="z-index: 4;">
         <div class="col-md-4 col-lg-3 position-relative" style="min-height: 240px; height: 100%;">
             <img 
                 src="<?= e($dashboardCowImage); ?>" 
@@ -63,7 +66,7 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
                 onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-cow.jpg';"
             >
             <div class="position-absolute top-0 start-0 m-3">
-                <span class="badge bg-gold text-forest-dark fw-bold shadow-sm">
+                <span class="badge bg-gold text-forest-dark fw-bold shadow-sm animate-pulse-glow">
                     <i class="bi bi-patch-check-fill me-1"></i> Sanctuary Matriarch
                 </span>
             </div>
@@ -76,12 +79,15 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
         <div class="col-md-8 col-lg-9 p-4 p-lg-5">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
                 <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-gold-subtle text-gold small border border-warning border-opacity-25">
-                    <i class="bi bi-shield-fill-check"></i>
+                    <span class="pulse-dot pulse-gold"></span>
                     <span>Live Sanctuary Operations Hub • Nandi Hills, Karnataka</span>
                 </div>
-                <span class="small text-white-50">
-                    <i class="bi bi-calendar3 me-1"></i> <?= date('l, d F Y'); ?>
-                </span>
+                <div class="d-flex align-items-center gap-2 small text-white-50">
+                    <span class="badge bg-success-subtle text-success border border-success border-opacity-25 px-2 py-1 rounded-pill">
+                        <span class="pulse-dot me-1"></span> Live Active
+                    </span>
+                    <span id="adminLiveClock" class="fw-bold font-monospace text-gold ms-1"></span>
+                </div>
             </div>
             <h2 class="h3 font-serif text-cream fw-bold mb-2">
                 Welcome back, <?= e($currentUser['name'] ?? 'Administrator'); ?>
@@ -107,11 +113,11 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
     </div>
 </div>
 
-<!-- Quick Action Shortcuts Bar -->
-<div class="card p-3 rounded-4 border-0 shadow-sm bg-white mb-4">
+<!-- Quick Action Shortcuts Bar with Hover Animation -->
+<div class="card p-3 rounded-4 border-0 shadow-sm bg-white mb-4 admin-action-card">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
         <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-gold text-forest-dark fw-bold px-3 py-1 rounded-pill">Quick Actions</span>
+            <span class="badge bg-gold text-forest-dark fw-bold px-3 py-1 rounded-pill grand-shimmer-badge">Quick Actions</span>
             <span class="small text-muted">Direct management shortcuts:</span>
         </div>
         <div class="d-flex flex-wrap gap-2">
@@ -131,17 +137,27 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
     </div>
 </div>
 
-<!-- Primary KPI Metrics Grid -->
+<!-- Primary KPI Metrics Grid with Grand 3D Tilt & SVG Circular Progress Gauges -->
 <div class="row g-4 mb-4">
     
     <!-- KPI 1: Resident Cows -->
     <div class="col-sm-6 col-xl-3">
-        <div class="stat-card h-100">
-            <div class="stat-icon-wrapper" style="background:rgba(31,96,69,0.15);color:var(--color-forest);">
-                <i class="bi bi-flower1"></i>
+        <div class="luminous-kpi-card tilt-card h-100 d-flex flex-column justify-content-between">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="stat-icon-wrapper" style="background:rgba(31,82,87,0.12);color:var(--color-secondary);">
+                    <i class="bi bi-flower1"></i>
+                </div>
+                <!-- Circular Capacity Meter (85%) -->
+                <div class="circle-progress-container">
+                    <svg class="circle-progress-svg" width="52" height="52">
+                        <circle class="circle-progress-bg" cx="26" cy="26" r="22"></circle>
+                        <circle class="circle-progress-bar" cx="26" cy="26" r="22" data-percent="85" style="stroke: var(--color-secondary);"></circle>
+                    </svg>
+                    <span class="circle-progress-text">85%</span>
+                </div>
             </div>
             <div>
-                <div class="stat-number fs-3"><?= $totalCows; ?></div>
+                <div class="stat-number fs-3 admin-counter-value" data-target="<?= $totalCows; ?>"><?= $totalCows; ?></div>
                 <p class="stat-label mb-1">Protected Resident Cows</p>
                 <small class="text-muted d-block"><?= $treatmentCows; ?> in Medical/Hospice &bull; <?= $adoptedCows; ?> Adopted</small>
             </div>
@@ -150,12 +166,22 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
 
     <!-- KPI 2: Total 80G Donations -->
     <div class="col-sm-6 col-xl-3">
-        <div class="stat-card h-100">
-            <div class="stat-icon-wrapper" style="background:rgba(214,154,58,0.15);color:var(--color-gold-dark);">
-                <i class="bi bi-cash-stack"></i>
+        <div class="luminous-kpi-card tilt-card h-100 d-flex flex-column justify-content-between">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="stat-icon-wrapper" style="background:rgba(233,120,58,0.14);color:var(--color-accent);">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <!-- Circular Target Meter (92%) -->
+                <div class="circle-progress-container">
+                    <svg class="circle-progress-svg" width="52" height="52">
+                        <circle class="circle-progress-bg" cx="26" cy="26" r="22"></circle>
+                        <circle class="circle-progress-bar" cx="26" cy="26" r="22" data-percent="92" style="stroke: var(--color-accent);"></circle>
+                    </svg>
+                    <span class="circle-progress-text">92%</span>
+                </div>
             </div>
             <div>
-                <div class="stat-number fs-3"><?= format_inr($totalDonationsAmount, true); ?></div>
+                <div class="stat-number fs-3 admin-counter-value" data-target="<?= $totalDonationsAmount; ?>" data-is-currency="true"><?= format_inr($totalDonationsAmount, true); ?></div>
                 <p class="stat-label mb-1">Total 80G Seva Donations</p>
                 <small class="text-muted d-block"><?= $totalDonationsCount; ?> Verified Transactions</small>
             </div>
@@ -164,12 +190,22 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
 
     <!-- KPI 3: Store Orders & Revenue -->
     <div class="col-sm-6 col-xl-3">
-        <div class="stat-card h-100">
-            <div class="stat-icon-wrapper" style="background:rgba(139,94,60,0.15);color:var(--color-earth);">
-                <i class="bi bi-bag-check"></i>
+        <div class="luminous-kpi-card tilt-card h-100 d-flex flex-column justify-content-between">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="stat-icon-wrapper" style="background:rgba(95,168,168,0.15);color:var(--color-highlight);">
+                    <i class="bi bi-bag-check"></i>
+                </div>
+                <!-- Circular Inventory Turnover (76%) -->
+                <div class="circle-progress-container">
+                    <svg class="circle-progress-svg" width="52" height="52">
+                        <circle class="circle-progress-bg" cx="26" cy="26" r="22"></circle>
+                        <circle class="circle-progress-bar" cx="26" cy="26" r="22" data-percent="76" style="stroke: var(--color-highlight);"></circle>
+                    </svg>
+                    <span class="circle-progress-text">76%</span>
+                </div>
             </div>
             <div>
-                <div class="stat-number fs-3"><?= format_inr($totalStoreRevenue, true); ?></div>
+                <div class="stat-number fs-3 admin-counter-value" data-target="<?= $totalStoreRevenue; ?>" data-is-currency="true"><?= format_inr($totalStoreRevenue, true); ?></div>
                 <p class="stat-label mb-1">Organic Store Revenue</p>
                 <small class="text-muted d-block"><?= $totalOrdersCount; ?> Total Customer Orders</small>
             </div>
@@ -178,16 +214,26 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
 
     <!-- KPI 4: Active Adoptions & Messages -->
     <div class="col-sm-6 col-xl-3">
-        <div class="stat-card h-100">
-            <div class="stat-icon-wrapper" style="background:rgba(18,55,42,0.15);color:var(--color-forest-dark);">
-                <i class="bi bi-suit-heart"></i>
+        <div class="luminous-kpi-card tilt-card h-100 d-flex flex-column justify-content-between">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="stat-icon-wrapper" style="background:rgba(244,177,131,0.18);color:var(--color-accent-light);">
+                    <i class="bi bi-suit-heart"></i>
+                </div>
+                <!-- Circular Guardianship Rate (68%) -->
+                <div class="circle-progress-container">
+                    <svg class="circle-progress-svg" width="52" height="52">
+                        <circle class="circle-progress-bg" cx="26" cy="26" r="22"></circle>
+                        <circle class="circle-progress-bar" cx="26" cy="26" r="22" data-percent="68" style="stroke: var(--color-primary);"></circle>
+                    </svg>
+                    <span class="circle-progress-text">68%</span>
+                </div>
             </div>
             <div>
-                <div class="stat-number fs-3"><?= $totalAdoptionsCount; ?></div>
+                <div class="stat-number fs-3 admin-counter-value" data-target="<?= $totalAdoptionsCount; ?>"><?= $totalAdoptionsCount; ?></div>
                 <p class="stat-label mb-1">Active Cow Guardians</p>
                 <small class="text-muted d-block">
                     <?php if ($unreadMessages > 0): ?>
-                        <span class="badge bg-danger rounded-pill"><?= $unreadMessages; ?> Unread Inquiries</span>
+                        <span class="badge bg-danger rounded-pill animate-pulse-glow"><?= $unreadMessages; ?> Unread Inquiries</span>
                     <?php else: ?>
                         0 Unread Inquiries
                     <?php endif; ?>

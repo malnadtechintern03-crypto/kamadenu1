@@ -92,6 +92,17 @@ require_once __DIR__ . '/includes/header.php';
                     <input type="file" name="site_logo" class="form-control" accept="image/png,image/webp,image/jpeg">
                     <small class="text-muted">Recommended dimensions: 512x512px transparent PNG.</small>
                 </div>
+                <div class="col-12 mt-3 pt-3 border-top">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div>
+                            <span class="fw-bold text-forest-dark small"><i class="bi bi-layout-text-window-reverse text-gold me-1"></i> Homepage Hero Slides & Banners</span>
+                            <p class="text-muted extra-small mb-0">Customize hero section headlines, Sanskrit taglines, call-to-action buttons, and photography.</p>
+                        </div>
+                        <a href="<?= BASE_URL; ?>/admin/hero.php" class="btn btn-sm btn-gold rounded-pill px-3 shadow-gold">
+                            <i class="bi bi-sliders me-1"></i> Manage Hero Slides
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 

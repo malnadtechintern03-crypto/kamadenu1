@@ -57,7 +57,7 @@ try {
         <div class="row g-4 mb-5">
             <div class="col-md-4">
                 <div class="stat-card">
-                    <div class="stat-icon-wrapper" style="background:rgba(31,96,69,0.15);color:var(--color-forest);">
+                    <div class="stat-icon-wrapper" style="background:rgba(31,82,87,0.12);color:var(--color-secondary);">
                         <i class="bi bi-cash-stack"></i>
                     </div>
                     <div>
@@ -69,7 +69,7 @@ try {
 
             <div class="col-md-4">
                 <div class="stat-card">
-                    <div class="stat-icon-wrapper" style="background:rgba(214,154,58,0.15);color:var(--color-gold-dark);">
+                    <div class="stat-icon-wrapper" style="background:rgba(233,120,58,0.14);color:var(--color-accent);">
                         <i class="bi bi-receipt"></i>
                     </div>
                     <div>
@@ -81,7 +81,7 @@ try {
 
             <div class="col-md-4">
                 <div class="stat-card">
-                    <div class="stat-icon-wrapper" style="background:rgba(139,94,60,0.15);color:var(--color-earth);">
+                    <div class="stat-icon-wrapper" style="background:rgba(95,168,168,0.15);color:var(--color-highlight);">
                         <i class="bi bi-bank"></i>
                     </div>
                     <div>

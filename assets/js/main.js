@@ -7,8 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initStickyNavbar();
   initMobileNav();
   initAnimatedCounters();
+  initScrollAnimations();
+  initRippleEffects();
+  initHeroParallax();
   initSmoothScroll();
   initTooltips();
+  initGoldenParticles('heroParticlesCanvas');
+  initCarouselProgress();
+  initInteractive3DTilt();
+  initCircleProgress();
 });
 
 /**
@@ -51,15 +58,15 @@ function initStickyNavbar() {
 }
 
 /**
- * Animate Numbers on Impact Dashboard
+ * Animate Numbers on Impact Dashboard with Easing
  */
 function initAnimatedCounters() {
   const counters = document.querySelectorAll('.counter-value');
   if (counters.length === 0) return;
 
   const observerOptions = {
-    threshold: 0.25,
-    rootMargin: '0px'
+    threshold: 0.2,
+    rootMargin: '0px 0px -40px 0px'
   };
 
   const counterObserver = new IntersectionObserver((entries, observer) => {
@@ -67,28 +74,135 @@ function initAnimatedCounters() {
       if (entry.isIntersecting) {
         const counter = entry.target;
         const target = parseInt(counter.getAttribute('data-target') || '0', 10);
-        const duration = 1600; // ms
-        const stepTime = 20;
-        const totalSteps = duration / stepTime;
-        const stepValue = target / totalSteps;
-        let current = 0;
+        const duration = 1800; // ms
+        const startTime = performance.now();
 
-        const timer = setInterval(() => {
-          current += stepValue;
-          if (current >= target) {
-            counter.textContent = target.toLocaleString('en-IN');
-            clearInterval(timer);
+        // EaseOutExpo curve
+        const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+
+        const updateCounter = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const current = Math.floor(easeOutExpo(progress) * target);
+
+          counter.textContent = current.toLocaleString('en-IN');
+
+          if (progress < 1) {
+            requestAnimationFrame(updateCounter);
           } else {
-            counter.textContent = Math.floor(current).toLocaleString('en-IN');
+            counter.textContent = target.toLocaleString('en-IN');
+            counter.classList.add('counted');
           }
-        }, stepTime);
+        };
 
+        requestAnimationFrame(updateCounter);
         observer.unobserve(counter);
       }
     });
   }, observerOptions);
 
   counters.forEach(counter => counterObserver.observe(counter));
+}
+
+/**
+ * Scroll Reveal Animation Engine
+ * Automatically animates elements with [data-animate] and auto-staggers card grids
+ */
+function initScrollAnimations() {
+  // Auto-tag common cards & sections across all pages with data-animate if not already tagged
+  const targetSelectors = [
+    '.stat-card', '.cow-card', '.journey-step-card', '.seva-program-card',
+    '.heritage-card', '.feature-box', '.product-card', '.gallery-item',
+    '.preset-giving-card', '.testimonial-card', '.transparency-card',
+    '.donor-tier-card', '.accordion-item', '.video-card', '.contact-info-card',
+    '.donation-box', '.receipt-card', '.cart-summary-card', '.blog-card-img',
+    '.legal-content h3', '.breed-card'
+  ].join(', ');
+
+  document.querySelectorAll(targetSelectors).forEach((el, index) => {
+    if (!el.hasAttribute('data-animate')) {
+      el.setAttribute('data-animate', 'fade-up');
+      const delay = (index % 4) * 90 + 50;
+      el.setAttribute('data-delay', delay.toString());
+    }
+  });
+
+  const animElements = document.querySelectorAll('[data-animate], .reveal-on-scroll');
+  if (animElements.length === 0) return;
+
+  const animObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-revealed');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.12,
+    rootMargin: '0px 0px -50px 0px'
+  });
+
+  animElements.forEach(el => animObserver.observe(el));
+}
+
+/**
+ * Material / Liquid Button Ripple Click Feedback
+ */
+function initRippleEffects() {
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-gold, .btn-saffron, .btn-forest, .btn-outline-forest, .admin-nav-link');
+    if (!btn) return;
+
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const ripple = document.createElement('span');
+    ripple.className = 'btn-ripple-wave';
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    ripple.style.position = 'absolute';
+    ripple.style.width = '20px';
+    ripple.style.height = '20px';
+    ripple.style.transform = 'translate(-50%, -50%) scale(0)';
+    ripple.style.borderRadius = '50%';
+    ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+    ripple.style.pointerEvents = 'none';
+    ripple.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
+    ripple.style.zIndex = '10';
+
+    btn.style.position = btn.style.position || 'relative';
+    btn.appendChild(ripple);
+
+    requestAnimationFrame(() => {
+      ripple.style.transform = 'translate(-50%, -50%) scale(15)';
+      ripple.style.opacity = '0';
+    });
+
+    setTimeout(() => ripple.remove(), 600);
+  });
+}
+
+/**
+ * Subtle Scroll Parallax for Hero Background
+ */
+function initHeroParallax() {
+  const heroImage = document.querySelector('.hero-bg-image');
+  if (!heroImage) return;
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const scrolled = window.pageYOffset;
+        if (scrolled < 800) {
+          heroImage.style.transform = `translateY(${scrolled * 0.15}px)`;
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
 }
 
 /**
@@ -194,3 +308,167 @@ async function apiFetch(url, options = {}) {
     throw error;
   }
 }
+
+/**
+ * Grand Golden Particle Sparks & Sacred Motes Canvas Engine
+ */
+function initGoldenParticles(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  let width = (canvas.width = canvas.parentElement.offsetWidth || window.innerWidth);
+  let height = (canvas.height = canvas.parentElement.offsetHeight || window.innerHeight);
+
+  const particles = [];
+  const particleCount = Math.min(Math.floor(width / 24), 45);
+
+  class GoldenMote {
+    constructor() {
+      this.reset(true);
+    }
+    reset(initial = false) {
+      this.x = Math.random() * width;
+      this.y = initial ? Math.random() * height : height + 10;
+      this.size = Math.random() * 2.8 + 1.2;
+      this.speedY = Math.random() * 0.45 + 0.25;
+      this.speedX = (Math.random() - 0.5) * 0.35;
+      this.opacity = Math.random() * 0.55 + 0.25;
+      this.maxOpacity = this.opacity;
+      this.fadeSpeed = Math.random() * 0.008 + 0.004;
+      this.pulse = Math.random() * Math.PI * 2;
+    }
+    update() {
+      this.y -= this.speedY;
+      this.x += this.speedX + Math.sin(this.pulse) * 0.25;
+      this.pulse += 0.03;
+      this.opacity = (Math.sin(this.pulse) * 0.5 + 0.5) * this.maxOpacity;
+
+      if (this.y < -10 || this.x < -10 || this.x > width + 10) {
+        this.reset(false);
+      }
+    }
+    draw() {
+      ctx.save();
+      ctx.beginPath();
+      const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2);
+      gradient.addColorStop(0, `rgba(255, 230, 167, ${this.opacity})`);
+      gradient.addColorStop(0.4, `rgba(232, 120, 42, ${this.opacity * 0.7})`);
+      gradient.addColorStop(1, 'rgba(232, 120, 42, 0)');
+      ctx.fillStyle = gradient;
+      ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push(new GoldenMote());
+  }
+
+  let animationFrame;
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    animationFrame = requestAnimationFrame(animate);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    if (canvas && canvas.parentElement) {
+      width = canvas.width = canvas.parentElement.offsetWidth;
+      height = canvas.height = canvas.parentElement.offsetHeight;
+    }
+  }, { passive: true });
+}
+
+/**
+ * Carousel Slide Progress Countdown Bar
+ */
+function initCarouselProgress() {
+  const carousel = document.getElementById('homepageHeroCarousel');
+  const progressBar = document.getElementById('heroCarouselProgress');
+  if (!carousel || !progressBar) return;
+
+  const duration = 6000; // ms
+  let startTime = performance.now();
+  let animId;
+
+  function updateBar(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min((elapsed / duration) * 100, 100);
+    progressBar.style.width = progress + '%';
+
+    if (progress < 100) {
+      animId = requestAnimationFrame(updateBar);
+    }
+  }
+
+  animId = requestAnimationFrame(updateBar);
+
+  carousel.addEventListener('slide.bs.carousel', () => {
+    cancelAnimationFrame(animId);
+    progressBar.style.width = '0%';
+    startTime = performance.now();
+    animId = requestAnimationFrame(updateBar);
+  });
+}
+
+/**
+ * Interactive 3D Card Mouse Perspective Tilt
+ */
+function initInteractive3DTilt() {
+  const cards = document.querySelectorAll('.tilt-card, .cow-card, .stat-card, .preset-giving-card');
+  if (cards.length === 0 || window.innerWidth < 992) return;
+
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = ((y - centerY) / centerY) * -5;
+      const rotateY = ((x - centerX) / centerX) * 5;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
+      card.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+    });
+
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'transform 0.1s ease-out';
+    });
+  });
+}
+
+/**
+ * SVG Circular Progress Meters
+ */
+function initCircleProgress() {
+  const meters = document.querySelectorAll('.circle-progress-bar');
+  if (meters.length === 0) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const bar = entry.target;
+        const percent = parseFloat(bar.getAttribute('data-percent') || '0');
+        const circumference = 138;
+        const offset = circumference - (percent / 100) * circumference;
+        bar.style.strokeDashoffset = offset.toString();
+        observer.unobserve(bar);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  meters.forEach(m => observer.observe(m));
+}
+

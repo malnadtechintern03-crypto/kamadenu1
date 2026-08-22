@@ -10,6 +10,7 @@ START TRANSACTION;
 SET time_zone = "+05:30";
 
 -- Drop existing tables in reverse dependency order
+DROP TABLE IF EXISTS `hero_slides`;
 DROP TABLE IF EXISTS `activity_logs`;
 DROP TABLE IF EXISTS `expenses`;
 DROP TABLE IF EXISTS `expense_categories`;
@@ -135,6 +136,35 @@ INSERT INTO `settings` (`setting_key`, `setting_value`, `group_name`, `is_public
 ('bank_ifsc', 'SBIN0004281', 'bank', 1),
 ('bank_branch', 'Nandi Hills Branch, Bangalore', 'bank', 1),
 ('upi_id', 'kamadenu@sbi', 'bank', 1);
+
+-- ==============================================================================
+-- 2B. HOMEPAGE HERO SECTION SLIDES
+-- ==============================================================================
+
+CREATE TABLE `hero_slides` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `eyebrow` VARCHAR(100) DEFAULT 'KAMADENU GOUSHALA',
+  `title` VARCHAR(255) NOT NULL,
+  `subtitle` TEXT DEFAULT NULL,
+  `image_path` VARCHAR(255) DEFAULT 'assets/images/hero-cow.jpg',
+  `btn_primary_text` VARCHAR(80) DEFAULT 'Support a Cow',
+  `btn_primary_url` VARCHAR(255) DEFAULT '/donate.php',
+  `btn_primary_icon` VARCHAR(50) DEFAULT 'bi-heart-fill',
+  `btn_secondary_text` VARCHAR(80) DEFAULT 'Explore Our Goushala',
+  `btn_secondary_url` VARCHAR(255) DEFAULT '/about.php',
+  `btn_secondary_icon` VARCHAR(50) DEFAULT 'bi-compass',
+  `badge_text` VARCHAR(100) DEFAULT NULL,
+  `display_order` INT DEFAULT 0,
+  `is_active` TINYINT(1) DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `hero_slides` (`id`, `eyebrow`, `title`, `subtitle`, `image_path`, `btn_primary_text`, `btn_primary_url`, `btn_primary_icon`, `btn_secondary_text`, `btn_secondary_url`, `btn_secondary_icon`, `badge_text`, `display_order`, `is_active`) VALUES
+(1, 'KAMADENU GOUSHALA • NANDI HILLS', 'Every Life Deserves Care & Dignity.', 'Protecting, healing, and nurturing rescued indigenous cows with unconditional love, Vedic seva, and 24x7 veterinary medicine.', 'assets/images/hero-cow.jpg', 'Support a Rescued Cow', '/donate.php', 'bi-heart-fill', 'Explore Our Sanctuary', '/about.php', 'bi-compass', '80G Tax Exemption Available', 1, 1),
+(2, 'SACRED BOS INDICUS HERITAGE', 'Preserving Sacred Indigenous Cows', 'Sanctuary home to over 500+ pure Gir, Sahiwal, Hallikar, and Malnad Gidda breeds thriving peacefully with 100% transparent daily seva.', 'assets/images/breeds/gir.jpg', 'Adopt a Gau Mata', '/adopt.php', 'bi-suit-heart-fill', 'Meet Our Cows', '/cows.php', 'bi-person-badge', '15-Acre Organic Pasture', 2, 1),
+(3, 'AUSPICIOUS GAU SEVA & GRĀSA DĀNA', 'Feed a Sacred Cow Today (Grāsa Dāna)', 'Experience divine blessings by sponsoring nutritious green grass, dry jowar husk, Ayurvedic mineral supplements, and emergency ambulance rescues.', 'assets/images/about-goushala.jpg', 'Feed a Cow (from ₹101)', '/feed.php', 'bi-gift-fill', 'Watch Live Darshan', '/videos.php', 'bi-camera-reels', 'Instant 80G Digital Receipt', 3, 1);
+
 
 -- ==============================================================================
 -- 3. COW DIRECTORY & MEDICAL RECORD SYSTEM
