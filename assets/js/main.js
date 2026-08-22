@@ -317,11 +317,26 @@ function initGoldenParticles(canvasId) {
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
-  let width = (canvas.width = canvas.parentElement.offsetWidth || window.innerWidth);
-  let height = (canvas.height = canvas.parentElement.offsetHeight || window.innerHeight);
+  const parent = canvas.parentElement;
+  if (!parent) return;
+
+  let width = (canvas.width = parent.offsetWidth || window.innerWidth);
+  let height = (canvas.height = parent.offsetHeight || window.innerHeight);
 
   const particles = [];
-  const particleCount = Math.min(Math.floor(width / 24), 45);
+  const particleCount = Math.min(Math.floor(width / 20), 50);
+  let mouse = { x: -1000, y: -1000, radius: 120 };
+
+  parent.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+
+  parent.addEventListener('mouseleave', () => {
+    mouse.x = -1000;
+    mouse.y = -1000;
+  });
 
   class GoldenMote {
     constructor() {
@@ -329,34 +344,43 @@ function initGoldenParticles(canvasId) {
     }
     reset(initial = false) {
       this.x = Math.random() * width;
-      this.y = initial ? Math.random() * height : height + 10;
+      this.y = initial ? Math.random() * height : height + 15;
       this.size = Math.random() * 2.8 + 1.2;
       this.speedY = Math.random() * 0.45 + 0.25;
-      this.speedX = (Math.random() - 0.5) * 0.35;
-      this.opacity = Math.random() * 0.55 + 0.25;
+      this.speedX = (Math.random() - 0.5) * 0.4;
+      this.opacity = Math.random() * 0.55 + 0.3;
       this.maxOpacity = this.opacity;
-      this.fadeSpeed = Math.random() * 0.008 + 0.004;
       this.pulse = Math.random() * Math.PI * 2;
     }
     update() {
       this.y -= this.speedY;
-      this.x += this.speedX + Math.sin(this.pulse) * 0.25;
-      this.pulse += 0.03;
+      this.x += this.speedX + Math.sin(this.pulse) * 0.3;
+      this.pulse += 0.035;
       this.opacity = (Math.sin(this.pulse) * 0.5 + 0.5) * this.maxOpacity;
 
-      if (this.y < -10 || this.x < -10 || this.x > width + 10) {
+      // Interactive gentle mouse physics
+      const dx = mouse.x - this.x;
+      const dy = mouse.y - this.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < mouse.radius && dist > 0) {
+        const force = (1 - dist / mouse.radius) * 1.6;
+        this.x -= (dx / dist) * force;
+        this.y -= (dy / dist) * force;
+      }
+
+      if (this.y < -15 || this.x < -15 || this.x > width + 15) {
         this.reset(false);
       }
     }
     draw() {
       ctx.save();
       ctx.beginPath();
-      const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2);
-      gradient.addColorStop(0, `rgba(255, 230, 167, ${this.opacity})`);
-      gradient.addColorStop(0.4, `rgba(232, 120, 42, ${this.opacity * 0.7})`);
-      gradient.addColorStop(1, 'rgba(232, 120, 42, 0)');
+      const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2.2);
+      gradient.addColorStop(0, `rgba(255, 235, 175, ${this.opacity})`);
+      gradient.addColorStop(0.35, `rgba(233, 120, 58, ${this.opacity * 0.8})`);
+      gradient.addColorStop(1, 'rgba(233, 120, 58, 0)');
       ctx.fillStyle = gradient;
-      ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+      ctx.arc(this.x, this.y, this.size * 2.2, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
@@ -366,21 +390,20 @@ function initGoldenParticles(canvasId) {
     particles.push(new GoldenMote());
   }
 
-  let animationFrame;
   function animate() {
     ctx.clearRect(0, 0, width, height);
     particles.forEach(p => {
       p.update();
       p.draw();
     });
-    animationFrame = requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
   }
   animate();
 
   window.addEventListener('resize', () => {
-    if (canvas && canvas.parentElement) {
-      width = canvas.width = canvas.parentElement.offsetWidth;
-      height = canvas.height = canvas.parentElement.offsetHeight;
+    if (canvas && parent) {
+      width = canvas.width = parent.offsetWidth;
+      height = canvas.height = parent.offsetHeight;
     }
   }, { passive: true });
 }
@@ -418,10 +441,10 @@ function initCarouselProgress() {
 }
 
 /**
- * Interactive 3D Card Mouse Perspective Tilt
+ * Interactive 3D Card Mouse Perspective Tilt & Dynamic Specular Sheen
  */
 function initInteractive3DTilt() {
-  const cards = document.querySelectorAll('.tilt-card, .cow-card, .stat-card, .preset-giving-card');
+  const cards = document.querySelectorAll('.tilt-card, .cow-card, .stat-card, .preset-giving-card, .seva-program-card, .journey-step-card');
   if (cards.length === 0 || window.innerWidth < 992) return;
 
   cards.forEach(card => {
@@ -429,6 +452,10 @@ function initInteractive3DTilt() {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+      
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 

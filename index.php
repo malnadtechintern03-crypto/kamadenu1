@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 $pageTitle = 'Preserving Sacred Indigenous Cows with Vedic Care & Love';
 $metaDescription = 'Welcome to Kamadenu Goushala. We rescue, shelter, and provide lifelong holistic care for indigenous Indian cows. 80G Tax-exempt donations.';
+$hideTopbar = true;
 
 require_once __DIR__ . '/includes/header.php';
 
@@ -113,6 +114,8 @@ $resolveHeroImg = function(string $img): string {
     <section class="hero-section hero-slider-section position-relative p-0 overflow-hidden">
         <!-- Grand Golden Particle Sparks Layer -->
         <canvas id="heroParticlesCanvas" class="hero-particles-layer"></canvas>
+        <div class="hero-ambient-orb hero-ambient-orb-1"></div>
+        <div class="hero-ambient-orb hero-ambient-orb-2"></div>
 
         <div id="homepageHeroCarousel" class="carousel slide carousel-fade h-100" data-bs-ride="carousel" data-bs-interval="6000" data-bs-pause="hover">
             <!-- Carousel Slide Progress Countdown Bar -->
@@ -210,6 +213,8 @@ $resolveHeroImg = function(string $img): string {
 ?>
     <section class="hero-section position-relative overflow-hidden">
         <canvas id="heroParticlesCanvas" class="hero-particles-layer"></canvas>
+        <div class="hero-ambient-orb hero-ambient-orb-1"></div>
+        <div class="hero-ambient-orb hero-ambient-orb-2"></div>
         <div class="hero-image">
             <img src="<?= e($singleBg); ?>" alt="<?= e($singleSlide['title']); ?>" class="hero-bg-image" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/hero-cow.jpg';">
         </div>
@@ -264,6 +269,8 @@ $resolveHeroImg = function(string $img): string {
     <!-- Static Fallback Hero Section -->
     <section class="hero-section position-relative overflow-hidden">
         <canvas id="heroParticlesCanvas" class="hero-particles-layer"></canvas>
+        <div class="hero-ambient-orb hero-ambient-orb-1"></div>
+        <div class="hero-ambient-orb hero-ambient-orb-2"></div>
         <div class="hero-image">
             <img src="<?= BASE_URL; ?>/assets/images/hero-cow.jpg" alt="Rescued cow at Kamadenu Goushala" class="hero-bg-image">
         </div>
@@ -438,8 +445,16 @@ $resolveHeroImg = function(string $img): string {
 <!-- ==============================================================================
      4. A COW'S JOURNEY (Interactive 6-Stage Rescue Timeline)
      ============================================================================== -->
-<section class="py-5 bg-cream" data-animate="fade-up">
-    <div class="container py-4 text-center">
+<section class="py-5 bg-cream position-relative overflow-hidden" data-animate="fade-up">
+    <!-- Auspicious Sacred Mandala Accent -->
+    <div class="mandala-watermark mandala-watermark-right">
+        <svg viewBox="0 0 100 100" fill="currentColor">
+            <circle cx="50" cy="50" r="46" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            <circle cx="50" cy="50" r="32" stroke="currentColor" stroke-width="1" fill="none"/>
+            <path d="M50 4 Q58 35 50 50 Q42 35 50 4 Z M50 96 Q58 65 50 50 Q42 65 50 96 Z M4 50 Q35 58 50 50 Q35 42 4 50 Z M96 50 Q65 58 50 50 Q65 42 96 50 Z" fill="currentColor"/>
+        </svg>
+    </div>
+    <div class="container py-4 text-center position-relative" style="z-index: 2;">
         <span class="section-tag justify-content-center"><i class="bi bi-arrow-repeat"></i> Holistic Lifecycle</span>
         <h2 class="section-title">A Cow's Journey to Sanctuary</h2>
         <p class="section-subtitle mx-auto mb-5">Our 6-step compassionate protocol ensures every rescued soul transitions from trauma to lifelong peace.</p>
@@ -766,6 +781,8 @@ $resolveHeroImg = function(string $img): string {
      11. FINAL HIGH-IMPACT DONATION CALL TO ACTION
      ============================================================================== -->
 <section class="py-5 bg-forest-dark text-white text-center position-relative overflow-hidden" data-animate="zoom-in">
+    <div class="hero-ambient-orb hero-ambient-orb-1" style="opacity: 0.35;"></div>
+    <div class="hero-ambient-orb hero-ambient-orb-2" style="opacity: 0.25;"></div>
     <div class="container py-5 position-relative" style="z-index: 2;">
         <div class="row justify-content-center">
             <div class="col-lg-8">

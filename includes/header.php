@@ -48,7 +48,12 @@ $ogImage = $ogImage ?? (ASSETS_URL . '/images/og_banner.jpg');
 </head>
 <body>
 
-    <!-- Top Announcement & Contact Bar -->
+<?php 
+$currentScript = basename($_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '');
+$isHomePage = ($currentScript === 'index.php' && !str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/admin/'));
+?>
+    <!-- Top Announcement & Contact Bar (Hidden on Homepage) -->
+    <?php if (empty($hideTopbar) && !$isHomePage): ?>
     <aside class="heritage-topbar d-none d-lg-block">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-4">
@@ -62,5 +67,6 @@ $ogImage = $ogImage ?? (ASSETS_URL . '/images/og_banner.jpg');
             </div>
         </div>
     </aside>
+    <?php endif; ?>
 
     <?php require_once __DIR__ . '/navbar.php'; ?>
