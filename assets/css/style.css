@@ -2642,7 +2642,98 @@ html {
 }
 
 /* ------------------------------------------------------------------------------
-   8. REDUCED MOTION PREFERENCE (ACCESSIBILITY)
+   9. LIVE UPI QR SCANNER WIDGET STYLES
+   ------------------------------------------------------------------------------ */
+.upi-scanner-card {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.upi-scanner-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 16px 40px rgba(233, 120, 58, 0.18);
+}
+
+.upi-scanner-header {
+  background: linear-gradient(135deg, #102F32 0%, #1F5257 100%);
+  color: #FFFFFF;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.upi-scanner-frame {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin: 0 auto;
+  padding: 12px;
+  background: #FFFFFF;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 20px rgba(16, 47, 50, 0.08);
+  border: 2px dashed rgba(233, 120, 58, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.upi-scanner-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-xs);
+  display: block;
+}
+
+/* Scanning Laser Line Animation */
+.upi-scanner-laser {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #E9783A, #F4B183, transparent);
+  box-shadow: 0 0 12px #E9783A, 0 0 24px rgba(233, 120, 58, 0.8);
+  animation: scanLaser 2.8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes scanLaser {
+  0% {
+    top: 5%;
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    top: 92%;
+    opacity: 0.8;
+  }
+}
+
+/* Corner Scanner Accents */
+.scanner-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--color-accent);
+  border-style: solid;
+  pointer-events: none;
+}
+.scanner-corner-tl { top: 4px; left: 4px; border-width: 3px 0 0 3px; border-top-left-radius: 6px; }
+.scanner-corner-tr { top: 4px; right: 4px; border-width: 3px 3px 0 0; border-top-right-radius: 6px; }
+.scanner-corner-bl { bottom: 4px; left: 4px; border-width: 0 0 3px 3px; border-bottom-left-radius: 6px; }
+.scanner-corner-br { bottom: 4px; right: 4px; border-width: 0 3px 3px 0; border-bottom-right-radius: 6px; }
+
+/* ------------------------------------------------------------------------------
+   10. REDUCED MOTION PREFERENCE (ACCESSIBILITY)
    ------------------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -2662,3 +2753,4 @@ html {
     animation: none !important;
   }
 }
+

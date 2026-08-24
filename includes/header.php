@@ -48,25 +48,6 @@ $ogImage = $ogImage ?? (ASSETS_URL . '/images/og_banner.jpg');
 </head>
 <body>
 
-<?php 
-$currentScript = basename($_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '');
-$isHomePage = ($currentScript === 'index.php' && !str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/admin/'));
-?>
-    <!-- Top Announcement & Contact Bar (Hidden on Homepage) -->
-    <?php if (empty($hideTopbar) && !$isHomePage): ?>
-    <aside class="heritage-topbar d-none d-lg-block">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-4">
-                <span><i class="bi bi-geo-alt-fill text-gold me-1"></i> Nandi Hills Foothills, Bangalore</span>
-                <span><i class="bi bi-telephone-fill text-gold me-1"></i> <?= e(get_setting('site_phone', '+91 98450 12345')); ?></span>
-                <span><i class="bi bi-clock-fill text-gold me-1"></i> Darshan & Visiting: 7:00 AM - 6:00 PM</span>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <span class="badge bg-gold-subtle text-gold px-2 py-1 rounded-pill"><i class="bi bi-shield-check me-1"></i> 80G Tax Exempted</span>
-                <a href="<?= BASE_URL; ?>/contact.php" class="small"><i class="bi bi-envelope me-1"></i> Contact Us</a>
-            </div>
-        </div>
-    </aside>
-    <?php endif; ?>
 
     <?php require_once __DIR__ . '/navbar.php'; ?>
+

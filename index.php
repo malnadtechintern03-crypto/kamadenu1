@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 $pageTitle = 'Preserving Sacred Indigenous Cows with Vedic Care & Love';
 $metaDescription = 'Welcome to Kamadenu Goushala. We rescue, shelter, and provide lifelong holistic care for indigenous Indian cows. 80G Tax-exempt donations.';
-$hideTopbar = true;
 
 require_once __DIR__ . '/includes/header.php';
 
