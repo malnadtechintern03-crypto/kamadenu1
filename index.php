@@ -136,7 +136,7 @@ $resolveHeroImg = function(string $img): string {
         <div class="hero-ambient-orb hero-ambient-orb-1"></div>
         <div class="hero-ambient-orb hero-ambient-orb-2"></div>
 
-        <div id="homepageHeroCarousel" class="carousel slide carousel-fade w-100 h-100" data-bs-ride="carousel" data-bs-interval="6000" data-bs-pause="hover">
+        <div id="homepageHeroCarousel" class="carousel slide carousel-fade w-100 h-100" data-bs-ride="carousel" data-bs-interval="4000" data-bs-pause="hover">
             <!-- Carousel Slide Progress Countdown Bar -->
             <div class="carousel-slide-progress">
                 <div class="carousel-progress-fill" id="heroCarouselProgress"></div>

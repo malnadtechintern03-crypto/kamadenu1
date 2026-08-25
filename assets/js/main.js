@@ -445,7 +445,7 @@ function initCarouselProgress() {
   const progressBar = document.getElementById('heroCarouselProgress');
   if (!carousel || !progressBar) return;
 
-  const duration = 6000; // ms
+  const duration = parseInt(carousel.getAttribute('data-bs-interval') || '4000', 10);
   let startTime = performance.now();
   let animId;
 
