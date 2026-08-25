@@ -93,11 +93,27 @@ $inStock = (int)$product['stock_quantity'] > 0;
                 
                 <h1 class="h2 font-serif text-forest-dark fw-bold mb-3"><?= e($product['name']); ?></h1>
                 
-                <!-- Stock & Unit Status -->
-                <div class="d-flex align-items-center gap-3 mb-3 small">
+                <!-- Stock, Unit & Order Placed Status -->
+                <?php
+                $detailOrderCount = (int)($product['total_orders_count'] ?? 0);
+                $detailOrderedQty = (int)($product['total_ordered_qty'] ?? 0);
+                $detailHasOrders = $detailOrderCount > 0;
+                ?>
+                <div class="d-flex flex-wrap align-items-center gap-2 gap-md-3 mb-3 small">
                     <span class="badge <?= $inStock ? 'bg-success' : 'bg-secondary'; ?> rounded-pill px-3 py-1">
                         <?= $inStock ? '<i class="bi bi-check-circle-fill me-1"></i> In Stock (' . $product['stock_quantity'] . ' Units Available)' : 'Out of Stock'; ?>
                     </span>
+                    
+                    <?php if ($detailHasOrders): ?>
+                        <span class="badge bg-gold text-forest-dark rounded-pill px-3 py-1 fw-bold border border-warning border-opacity-50">
+                            <i class="bi bi-bag-check-fill me-1"></i> <?= $detailOrderCount; ?> <?= $detailOrderCount === 1 ? 'Order Placed' : 'Orders Placed'; ?> (<?= $detailOrderedQty; ?> <?= e($product['unit']); ?> Sold)
+                        </span>
+                    <?php else: ?>
+                        <span class="badge bg-light text-muted rounded-pill px-3 py-1 border">
+                            <i class="bi bi-tag me-1"></i> Ready for 1st Order
+                        </span>
+                    <?php endif; ?>
+
                     <span class="text-muted"><i class="bi bi-box-seam me-1"></i> Packaging Unit: <strong><?= e($product['unit']); ?></strong></span>
                 </div>
 

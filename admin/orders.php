@@ -36,9 +36,11 @@ $whereClause = implode(' AND ', $where);
 
 $orders = Database::fetchAll("
     SELECT o.*, c.name AS customer_name, c.email AS customer_email, c.phone AS customer_phone,
+           p.gateway AS payment_gateway,
            (SELECT COUNT(*) FROM order_items WHERE order_id = o.id) AS items_count
     FROM orders o 
     JOIN customers c ON o.customer_id = c.id 
+    LEFT JOIN payments p ON p.reference_type = 'order' AND p.reference_id = o.id
     WHERE {$whereClause} 
     ORDER BY o.created_at DESC
 ", $params);
@@ -71,9 +73,9 @@ require_once __DIR__ . '/includes/header.php';
                     <th>Order Reference</th>
                     <th>Date</th>
                     <th>Customer Name & Contact</th>
-                    <th>Items</th>
+                    <th>Payment</th>
                     <th>Total (INR)</th>
-                    <th>Current Status</th>
+                    <th>Order Status</th>
                     <th class="text-end">Update / View</th>
                 </tr>
             </thead>
@@ -88,19 +90,33 @@ require_once __DIR__ . '/includes/header.php';
                             'processing' => 'bg-warning text-dark',
                             default      => 'bg-secondary'
                         };
+                        $gw = strtolower($o['payment_gateway'] ?? 'upi');
+                        $isCod = in_array($gw, ['cash', 'cod'], true);
                     ?>
                     <tr>
                         <td>
                             <a href="<?= BASE_URL; ?>/admin/order-details.php?id=<?= $o['id']; ?>" class="fw-bold font-monospace text-forest text-decoration-none">
                                 <?= e($o['order_number']); ?>
                             </a>
+                            <div class="extra-small text-muted"><?= $o['items_count']; ?> <?= $o['items_count'] === 1 ? 'item' : 'items'; ?></div>
                         </td>
                         <td class="text-nowrap text-muted"><?= format_date($o['created_at']); ?></td>
                         <td>
                             <strong><?= e($o['customer_name']); ?></strong>
                             <div class="text-muted extra-small"><?= e($o['customer_email']); ?> &bull; <?= e($o['customer_phone']); ?></div>
                         </td>
-                        <td><?= $o['items_count']; ?> Products</td>
+                        <td>
+                            <?php if ($isCod): ?>
+                                <span class="badge bg-warning text-dark border border-warning rounded-pill extra-small"><i class="bi bi-truck me-1"></i> COD</span>
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill extra-small d-block mt-1">Pending</span>
+                            <?php elseif ($gw === 'upi'): ?>
+                                <span class="badge bg-success-subtle text-success border rounded-pill extra-small"><i class="bi bi-qr-code-scan me-1"></i> UPI</span>
+                                <span class="badge bg-success text-white rounded-pill extra-small d-block mt-1">Paid</span>
+                            <?php else: ?>
+                                <span class="badge bg-primary-subtle text-primary border rounded-pill extra-small"><i class="bi bi-credit-card me-1"></i> Online</span>
+                                <span class="badge bg-success text-white rounded-pill extra-small d-block mt-1">Paid</span>
+                            <?php endif; ?>
+                        </td>
                         <td class="font-serif text-forest-dark fw-bold"><?= format_inr($o['total_amount'], true); ?></td>
                         <td><span class="badge <?= $statusClass; ?> rounded-pill"><?= ucfirst($o['order_status']); ?></span></td>
                         <td class="text-end">

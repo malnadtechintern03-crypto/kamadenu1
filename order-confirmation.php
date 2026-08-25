@@ -68,7 +68,24 @@ require_once __DIR__ . '/includes/header.php';
                     </p>
                 </div>
                 <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
-                    <span class="badge bg-success px-3 py-2 rounded-pill small fw-bold">PAYMENT CONFIRMED</span>
+                    <?php
+                    $gateway = strtolower($order['gateway'] ?? 'online');
+                    $isCod = in_array($gateway, ['cash', 'cod'], true);
+                    $isUpi = ($gateway === 'upi');
+                    ?>
+                    <?php if ($isCod): ?>
+                        <span class="badge bg-warning text-forest-dark px-3 py-2 rounded-pill small fw-bold border border-warning">
+                            <i class="bi bi-truck me-1"></i> CASH ON DELIVERY (PENDING ON ARRIVAL)
+                        </span>
+                    <?php elseif ($isUpi): ?>
+                        <span class="badge bg-success px-3 py-2 rounded-pill small fw-bold">
+                            <i class="bi bi-qr-code-scan me-1"></i> DIRECT UPI TRANSFER (CONFIRMED)
+                        </span>
+                    <?php else: ?>
+                        <span class="badge bg-success px-3 py-2 rounded-pill small fw-bold">
+                            <i class="bi bi-shield-check me-1"></i> ONLINE PAYMENT CONFIRMED
+                        </span>
+                    <?php endif; ?>
                     <div class="small text-muted mt-1">Invoice / Order Ref:</div>
                     <strong class="font-monospace fs-6 text-forest-dark"><?= e($order['order_number']); ?></strong>
                 </div>
@@ -89,8 +106,8 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
                     <div class="text-muted">Order Date:</div>
                     <strong class="text-forest-dark fs-6"><?= format_date($order['created_at']); ?></strong>
-                    <div class="text-muted mt-2">Payment Gateway: <?= strtoupper($order['gateway'] ?? 'ONLINE'); ?></div>
-                    <div class="text-muted">Transaction ID: <span class="font-monospace"><?= e($order['transaction_id'] ?? 'PAID-ON-ORDER'); ?></span></div>
+                    <div class="text-muted mt-2">Payment Method: <strong><?= strtoupper($order['gateway'] ?? 'UPI'); ?></strong></div>
+                    <div class="text-muted">Transaction ID: <span class="font-monospace"><?= e($order['transaction_id'] ?? 'CONFIRMED'); ?></span></div>
                 </div>
             </div>
 
@@ -130,7 +147,9 @@ require_once __DIR__ . '/includes/header.php';
                             </td>
                         </tr>
                         <tr class="bg-cream fw-bold">
-                            <td colspan="3" class="text-end text-forest-dark fs-5">Grand Total Paid:</td>
+                            <td colspan="3" class="text-end text-forest-dark fs-5">
+                                <?= $isCod ? 'Total Payable on Delivery:' : 'Grand Total Paid:'; ?>
+                            </td>
                             <td class="text-end fs-4 font-serif text-forest-dark fw-bold"><?= format_inr($order['total_amount'], true); ?></td>
                         </tr>
                     </tfoot>

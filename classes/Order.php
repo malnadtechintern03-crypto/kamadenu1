@@ -130,7 +130,7 @@ class Order {
     /**
      * Process and place customer order from cart.
      */
-    public static function placeOrder(array $customerData, array $shippingData, string $paymentMethod = 'razorpay'): string {
+    public static function placeOrder(array $customerData, array $shippingData, string $paymentMethod = 'upi', ?string $utrNumber = null): string {
         $cart = self::getCart();
         if (empty($cart['items'])) {
             throw new RuntimeException('Cannot place an order with an empty shopping cart.');
@@ -172,13 +172,18 @@ class Order {
                 $shippingData['landmark'] ?? null
             ]);
 
-            // 3. Create Master Order Record
+            // 3. Determine Payment & Order Status
+            $isCod = in_array(strtolower($paymentMethod), ['cash', 'cod'], true);
+            $paymentStatus = $isCod ? 'pending' : 'paid';
+            $txnStatus = $isCod ? 'pending' : 'captured';
+
+            // 4. Create Master Order Record
             $orderNumber = 'ORD-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
             $orderId = Database::insert("
                 INSERT INTO orders (
                     order_number, customer_id, shipping_address_id, subtotal,
                     shipping_charge, total_amount, payment_status, order_status, customer_notes
-                ) VALUES (?, ?, ?, ?, ?, ?, 'paid', 'placed', ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'placed', ?)
             ", [
                 $orderNumber,
                 $customerId,
@@ -186,10 +191,11 @@ class Order {
                 $cart['subtotal'],
                 $cart['shipping'],
                 $cart['grand_total'],
+                $paymentStatus,
                 $customerData['notes'] ?? null
             ]);
 
-            // 4. Insert Order Items & Decrement Stock
+            // 5. Insert Order Items & Decrement Stock
             foreach ($cart['items'] as $item) {
                 Database::insert("
                     INSERT INTO order_items (order_id, product_id, product_name, unit_price, quantity, total_price)
@@ -211,16 +217,17 @@ class Order {
                 ", [$item['quantity'], $item['product_id']]);
             }
 
-            // 5. Record Payment Transaction
-            $txnId = 'TXN-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(4)));
+            // 6. Record Payment Transaction
+            $txnId = !empty($utrNumber) ? $utrNumber : ('TXN-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(4))));
             Database::insert("
                 INSERT INTO payments (transaction_id, reference_type, reference_id, gateway, amount, status, paid_at)
-                VALUES (?, 'order', ?, ?, ?, 'captured', NOW())
+                VALUES (?, 'order', ?, ?, ?, ?, NOW())
             ", [
                 $txnId,
                 $orderId,
                 $paymentMethod,
-                $cart['grand_total']
+                $cart['grand_total'],
+                $txnStatus
             ]);
 
             Database::commit();

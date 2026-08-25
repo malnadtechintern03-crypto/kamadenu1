@@ -13,7 +13,8 @@ require_once __DIR__ . '/includes/header.php';
 $filters = [
     'category' => sanitize_input($_GET['category'] ?? ''),
     'search'   => sanitize_input($_GET['q'] ?? ''),
-    'sort'     => sanitize_input($_GET['sort'] ?? 'featured')
+    'sort'     => sanitize_input($_GET['sort'] ?? 'featured'),
+    'ordered'  => (isset($_GET['filter']) && $_GET['filter'] === 'ordered') ? '1' : sanitize_input($_GET['ordered'] ?? '')
 ];
 
 $page = max(1, (int)($_GET['page'] ?? 1));
@@ -25,9 +26,21 @@ $totalProducts = $productData['total'];
 $totalPages = $productData['total_pages'];
 
 $categories = Product::getCategories();
-$hasActiveFilters = !empty($filters['category']) || !empty($filters['search']);
+$hasActiveFilters = !empty($filters['category']) || !empty($filters['search']) || !empty($filters['ordered']);
 
 $cart = Order::getCart();
+
+// Fetch all products that have received orders
+$orderedProductsList = Database::fetchAll("
+    SELECT p.*, pc.name AS category_name, pc.slug AS category_slug,
+           (SELECT COALESCE(SUM(oi.quantity), 0) FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE oi.product_id = p.id AND o.order_status != 'cancelled') AS total_ordered_qty,
+           (SELECT COUNT(DISTINCT oi.order_id) FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE oi.product_id = p.id AND o.order_status != 'cancelled') AS total_orders_count
+    FROM products p
+    JOIN product_categories pc ON p.category_id = pc.id
+    WHERE p.is_active = 1 
+      AND (SELECT COUNT(*) FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE oi.product_id = p.id AND o.order_status != 'cancelled') > 0
+    ORDER BY total_orders_count DESC, total_ordered_qty DESC
+");
 ?>
 
 <!-- Page Hero -->
@@ -47,27 +60,37 @@ $cart = Order::getCart();
 <section class="py-5 bg-cream-soft">
     <div class="container py-3">
         
-        <!-- Category Filter Tabs & Cart Bar -->
+        <!-- Category Filter Tabs, Small Ordered Icon & Cart Bar -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <!-- Filter Pills -->
             <div class="d-flex flex-wrap gap-2">
-                <a href="<?= BASE_URL; ?>/products.php" class="btn btn-sm rounded-pill px-3 <?= empty($filters['category']) ? 'btn-forest' : 'btn-outline-forest'; ?>">
+                <a href="<?= BASE_URL; ?>/products.php" class="btn btn-sm rounded-pill px-3 <?= (empty($filters['category']) && empty($filters['ordered'])) ? 'btn-forest' : 'btn-outline-forest'; ?>">
                     All Products (<?= array_sum(array_column($categories, 'product_count')); ?>)
                 </a>
                 <?php foreach ($categories as $cat): ?>
-                    <a href="<?= BASE_URL; ?>/products.php?category=<?= e($cat['slug']); ?>" class="btn btn-sm rounded-pill px-3 <?= ($filters['category'] === $cat['slug']) ? 'btn-forest' : 'btn-outline-forest'; ?>">
+                    <a href="<?= BASE_URL; ?>/products.php?category=<?= e($cat['slug']); ?>" class="btn btn-sm rounded-pill px-3 <?= ($filters['category'] === $cat['slug'] && empty($filters['ordered'])) ? 'btn-forest' : 'btn-outline-forest'; ?>">
                         <?= e($cat['name']); ?> (<?= $cat['product_count']; ?>)
                     </a>
                 <?php endforeach; ?>
             </div>
 
-            <!-- Cart Trigger Link -->
-            <a href="<?= BASE_URL; ?>/cart.php" class="btn btn-gold btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-2 shadow-xs">
-                <i class="bi bi-cart3 fs-6"></i>
-                <span class="fw-bold">My Cart:</span>
-                <span class="badge bg-forest text-white rounded-pill" id="cartBadgeCount"><?= $cart['count']; ?></span>
-                <span class="small fw-bold"><?= format_inr($cart['subtotal']); ?></span>
-            </a>
+            <!-- Action Controls: Small Ordered Products Icon Button + My Cart -->
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <!-- Small Ordered Products Icon Button (Opens Modal with Ordered Products) -->
+                <button type="button" class="btn btn-outline-forest btn-sm rounded-pill d-inline-flex align-items-center gap-2 shadow-xs px-3 py-1" data-bs-toggle="modal" data-bs-target="#orderedProductsModal" title="Click to view products for which orders have been placed">
+                    <i class="bi bi-bag-check-fill text-gold fs-5"></i>
+                    <span class="fw-semibold small">Ordered Products</span>
+                    <span class="badge bg-gold text-forest-dark rounded-pill fw-bold" id="orderedProductsBadgeCount"><?= count($orderedProductsList); ?></span>
+                </button>
+
+                <!-- Cart Trigger Link -->
+                <a href="<?= BASE_URL; ?>/cart.php" class="btn btn-gold btn-sm rounded-pill px-3 py-1 d-inline-flex align-items-center gap-2 shadow-xs">
+                    <i class="bi bi-cart3 fs-6"></i>
+                    <span class="fw-bold">My Cart:</span>
+                    <span class="badge bg-forest text-white rounded-pill" id="cartBadgeCount"><?= $cart['count']; ?></span>
+                    <span class="small fw-bold"><?= format_inr($cart['subtotal']); ?></span>
+                </a>
+            </div>
         </div>
 
         <!-- Search and Sorting Bar -->
@@ -77,6 +100,9 @@ $cart = Order::getCart();
                     <form method="GET" action="<?= BASE_URL; ?>/products.php" class="d-flex gap-2">
                         <?php if (!empty($filters['category'])): ?>
                             <input type="hidden" name="category" value="<?= e($filters['category']); ?>">
+                        <?php endif; ?>
+                        <?php if (!empty($filters['ordered'])): ?>
+                            <input type="hidden" name="filter" value="ordered">
                         <?php endif; ?>
                         <input type="text" name="q" class="form-control form-control-sm" placeholder="Search by name, SKU..." value="<?= e($filters['search']); ?>">
                         <button type="submit" class="btn btn-forest btn-sm px-3"><i class="bi bi-search"></i></button>
@@ -93,6 +119,7 @@ $cart = Order::getCart();
                         };
                         ?>
                         <option value="<?= $buildSortUrl('featured'); ?>" <?= $filters['sort'] === 'featured' ? 'selected' : ''; ?>>Featured First</option>
+                        <option value="<?= $buildSortUrl('most_ordered'); ?>" <?= $filters['sort'] === 'most_ordered' ? 'selected' : ''; ?>>🔥 Most Ordered First</option>
                         <option value="<?= $buildSortUrl('price_low'); ?>" <?= $filters['sort'] === 'price_low' ? 'selected' : ''; ?>>Price: Low to High</option>
                         <option value="<?= $buildSortUrl('price_high'); ?>" <?= $filters['sort'] === 'price_high' ? 'selected' : ''; ?>>Price: High to Low</option>
                         <option value="<?= $buildSortUrl('name_asc'); ?>" <?= $filters['sort'] === 'name_asc' ? 'selected' : ''; ?>>Name (A to Z)</option>
@@ -106,7 +133,7 @@ $cart = Order::getCart();
             <div class="card p-5 text-center rounded-4 border-0 bg-white shadow-sm">
                 <i class="bi bi-shop fs-1 text-muted mb-2"></i>
                 <h3 class="font-serif text-forest-dark">No Products Found</h3>
-                <p class="text-muted small mb-3">Try choosing another category or clearing your search keywords.</p>
+                <p class="text-muted small mb-3">Try choosing another category, clearing your search keywords, or showing all items.</p>
                 <div>
                     <a href="<?= BASE_URL; ?>/products.php" class="btn btn-forest rounded-pill px-4">View All Products</a>
                 </div>
@@ -118,16 +145,27 @@ $cart = Order::getCart();
                     $effectivePrice = $hasDiscount ? (float)$p['discount_price'] : (float)$p['price'];
                     $saveAmount = $hasDiscount ? ($p['price'] - $p['discount_price']) : 0;
                     $prodImg = image_url($p['main_image'] ?? null, 'products', 'placeholder-product.jpg');
+                    $orderedCount = (int)($p['total_orders_count'] ?? 0);
+                    $orderedQty = (int)($p['total_ordered_qty'] ?? 0);
+                    $hasOrders = $orderedCount > 0;
                 ?>
                 <div class="col-sm-6 col-lg-3">
                     <div class="heritage-card h-100 d-flex flex-column">
                         <div class="position-relative overflow-hidden" style="height: 200px; background-color: var(--color-forest-dark);">
                             <img src="<?= e($prodImg); ?>" alt="<?= e($p['name']); ?>" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-product.jpg';">
-                            <?php if ($hasDiscount): ?>
+                            
+                            <!-- Left Corner Badge: Order Status or Discount -->
+                            <?php if ($hasOrders): ?>
+                                <span class="position-absolute top-0 start-0 m-3 badge bg-gold text-forest-dark fw-bold shadow-xs cursor-pointer" data-bs-toggle="modal" data-bs-target="#orderedProductsModal" title="Click to view all ordered products">
+                                    <i class="bi bi-bag-check-fill me-1"></i> Ordered (<?= $orderedCount; ?>)
+                                </span>
+                            <?php elseif ($hasDiscount): ?>
                                 <span class="position-absolute top-0 start-0 m-3 badge bg-danger text-white small">
                                     SAVE <?= format_inr($saveAmount); ?>
                                 </span>
                             <?php endif; ?>
+                            
+                            <!-- Right Corner Badge: Unit -->
                             <span class="position-absolute top-0 end-0 m-3 badge bg-gold-subtle text-gold-dark small">
                                 <?= e($p['unit'] ?? 'Unit'); ?>
                             </span>
@@ -137,11 +175,34 @@ $cart = Order::getCart();
                             <span class="text-gold-dark small text-uppercase tracking-wider fw-bold mb-1"><?= e($p['category_name']); ?></span>
                             <h3 class="h6 font-serif text-forest-dark mb-2 line-clamp-2"><?= e($p['name']); ?></h3>
                             
-                            <p class="small text-muted mb-3 flex-grow-1">
+                            <p class="small text-muted mb-2 flex-grow-1">
                                 <?= e(mb_strimwidth($p['short_description'] ?? $p['description'], 0, 85, '...')); ?>
                             </p>
 
-                            <div class="pt-3 border-top mt-auto">
+                            <!-- Order Status Verification Block -->
+                            <div class="mb-3">
+                                <?php if ($hasOrders): ?>
+                                    <div class="p-2 rounded-3 bg-cream border border-warning border-opacity-40 d-flex align-items-center justify-content-between extra-small cursor-pointer" data-bs-toggle="modal" data-bs-target="#orderedProductsModal" title="Click to view all ordered items">
+                                        <span class="text-forest-dark fw-bold">
+                                            <i class="bi bi-check-circle-fill text-success me-1"></i> Order Placed: <span class="text-success fw-bold">Yes</span>
+                                        </span>
+                                        <span class="badge bg-gold-subtle text-gold-dark fw-bold px-2 py-1 rounded-pill">
+                                            <?= $orderedCount; ?> <?= $orderedCount === 1 ? 'Order' : 'Orders'; ?> &bull; <?= $orderedQty; ?> <?= e($p['unit'] ?? 'units'); ?>
+                                        </span>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="p-2 rounded-3 bg-light border border-secondary border-opacity-20 d-flex align-items-center justify-content-between extra-small text-muted">
+                                        <span>
+                                            <i class="bi bi-clock text-muted me-1"></i> Order Placed: <strong>No Orders Yet</strong>
+                                        </span>
+                                        <span class="badge bg-secondary-subtle text-muted px-2 py-1 rounded-pill">
+                                            Ready for 1st Order
+                                        </span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="pt-2 border-top mt-auto">
                                 <div class="d-flex align-items-baseline justify-content-between mb-3">
                                     <div class="d-flex align-items-baseline gap-2">
                                         <span class="fs-5 font-serif text-forest-dark fw-bold"><?= format_inr($effectivePrice); ?></span>
@@ -244,6 +305,86 @@ $cart = Order::getCart();
 
     </div>
 </section>
+
+<!-- Ordered Products Modal (Opens when user clicks the small Ordered Products icon) -->
+<div class="modal fade" id="orderedProductsModal" tabindex="-1" aria-labelledby="orderedProductsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-forest text-white border-bottom border-warning border-opacity-25 px-4 py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="stat-icon stat-icon-gold" style="width: 38px; height: 38px; font-size: 1.15rem;">
+                        <i class="bi bi-bag-check-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title font-serif text-white mb-0" id="orderedProductsModalLabel">Products with Placed Orders</h5>
+                        <small class="text-cream opacity-90 extra-small">Verified devotee purchases & active sanctuary orders</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3 p-md-4 bg-cream-soft">
+                <?php if (empty($orderedProductsList)): ?>
+                    <div class="text-center py-5">
+                        <i class="bi bi-bag-x fs-1 text-muted"></i>
+                        <h6 class="font-serif text-forest-dark mt-2">No Products Ordered Yet</h6>
+                        <p class="text-muted small">Be the first to place an order from our organic Vedic store!</p>
+                    </div>
+                <?php else: ?>
+                    <p class="small text-muted mb-3">
+                        <i class="bi bi-info-circle-fill text-gold me-1"></i> Below is the list of products for which orders have been successfully placed by devotees:
+                    </p>
+                    <div class="d-flex flex-column gap-3">
+                        <?php foreach ($orderedProductsList as $op): 
+                            $opEffectivePrice = !empty($op['discount_price']) && $op['discount_price'] < $op['price'] ? (float)$op['discount_price'] : (float)$op['price'];
+                            $opImg = image_url($op['main_image'] ?? null, 'products', 'placeholder-product.jpg');
+                        ?>
+                        <div class="card p-3 rounded-3 border bg-white shadow-xs">
+                            <div class="row align-items-center g-3">
+                                <div class="col-3 col-sm-2 text-center">
+                                    <img src="<?= e($opImg); ?>" alt="<?= e($op['name']); ?>" class="img-fluid rounded-3 object-fit-cover" style="max-height: 75px; width: 75px;">
+                                </div>
+                                <div class="col-9 col-sm-6">
+                                    <span class="badge bg-gold-subtle text-gold-dark extra-small fw-bold text-uppercase mb-1"><?= e($op['category_name']); ?></span>
+                                    <h6 class="font-serif text-forest-dark mb-1 fs-6">
+                                        <a href="<?= BASE_URL; ?>/product-details.php?slug=<?= e($op['slug']); ?>" class="text-forest-dark text-decoration-none hover-gold">
+                                            <?= e($op['name']); ?>
+                                        </a>
+                                    </h6>
+                                    <div class="d-flex align-items-center gap-2 small mb-1">
+                                        <span class="font-serif text-forest-dark fw-bold"><?= format_inr($opEffectivePrice); ?></span>
+                                        <span class="text-muted extra-small">(<?= e($op['unit']); ?>)</span>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success text-white extra-small rounded-pill px-2 py-1">
+                                            <i class="bi bi-check-circle-fill me-1"></i> <?= $op['total_orders_count']; ?> <?= $op['total_orders_count'] == 1 ? 'Order Placed' : 'Orders Placed'; ?> &bull; <?= $op['total_ordered_qty']; ?> <?= e($op['unit']); ?> sold
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4 text-sm-end d-flex d-sm-block gap-2 justify-content-end">
+                                    <button type="button" class="btn btn-gold btn-sm rounded-pill px-3 fw-bold btn-buy-now shadow-xs" data-product-id="<?= $op['id']; ?>" title="Buy Now & Proceed to Checkout">
+                                        <i class="bi bi-bag-check-fill me-1"></i> Buy Now
+                                    </button>
+                                    <a href="<?= BASE_URL; ?>/product-details.php?slug=<?= e($op['slug']); ?>" class="btn btn-outline-forest btn-sm rounded-pill px-2" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <div class="modal-footer bg-white border-top px-4 py-2 d-flex justify-content-between align-items-center">
+                <span class="small text-muted">
+                    Total <strong><?= count($orderedProductsList); ?></strong> product(s) ordered
+                </span>
+                <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Add To Cart & Buy Now Client Handler Script -->
 <script>

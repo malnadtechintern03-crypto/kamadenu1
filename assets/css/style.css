@@ -2949,7 +2949,28 @@ html {
 .scanner-corner-tl { top: 4px; left: 4px; border-width: 3px 0 0 3px; border-top-left-radius: 6px; }
 .scanner-corner-tr { top: 4px; right: 4px; border-width: 3px 3px 0 0; border-top-right-radius: 6px; }
 .scanner-corner-bl { bottom: 4px; left: 4px; border-width: 0 0 3px 3px; border-bottom-left-radius: 6px; }
-.scanner-corner-br { bottom: 4px; right: 4px; border-width: 0 3px 3px 0; border-bottom-right-radius: 6px; }
+.scanner-corner-br { bottom: 4px; right: 4px; border-width: 0 3px 3px 0; border-top-right-radius: 6px; }
+
+/* Payment Method Cards */
+.payment-opt-card {
+  border: 2px solid rgba(31, 82, 87, 0.18) !important;
+  background-color: var(--color-surface) !important;
+  color: var(--color-primary) !important;
+  transition: all 0.25s ease !important;
+}
+
+.payment-opt-card:hover {
+  border-color: var(--color-accent) !important;
+  background-color: rgba(233, 120, 58, 0.05) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(31, 82, 87, 0.08);
+}
+
+.payment-opt-card.active {
+  border-color: var(--color-accent) !important;
+  background-color: rgba(233, 120, 58, 0.08) !important;
+  box-shadow: 0 0 0 1px var(--color-accent), 0 6px 18px rgba(233, 120, 58, 0.15) !important;
+}
 
 /* ------------------------------------------------------------------------------
    10. REDUCED MOTION PREFERENCE (ACCESSIBILITY)
