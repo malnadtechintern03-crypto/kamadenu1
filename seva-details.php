@@ -34,18 +34,6 @@ $metaDescription = $program['subtitle'] ?? ('Support ' . $program['title'] . ' a
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!-- Breadcrumb -->
-<div class="bg-cream border-bottom py-3">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/index.php" class="text-forest">Home</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/seva.php" class="text-forest">Gau Seva</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><?= e($program['title']); ?></li>
-            </ol>
-        </nav>
-    </div>
-</div>
 
 <!-- Main Seva Section -->
 <section class="py-5 bg-white">
@@ -132,6 +120,21 @@ require_once __DIR__ . '/includes/header.php';
                             <button type="submit" class="btn btn-gold btn-lg rounded-pill py-3 fw-bold shadow-gold">
                                 Proceed to Seva Offering <i class="bi bi-arrow-right ms-1"></i>
                             </button>
+                        </div>
+
+                        <?php
+                            $sevaWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                            $cleanSevaWaPhone = preg_replace('/\D/', '', $sevaWaPhone);
+                            $sevaWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                         "I would like to offer / inquire about the *" . $program['title'] . "* Seva Program.\n" .
+                                         "✨ *Suggested Offering:* " . format_inr($program['suggested_amount']) . "\n\n" .
+                                         "Please share family prayer sankalpam & booking details.";
+                            $sevaWaUrl = "https://wa.me/" . $cleanSevaWaPhone . "?text=" . rawurlencode($sevaWaMsg);
+                        ?>
+                        <div class="d-grid mt-2">
+                            <a href="<?= e($sevaWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm rounded-pill py-2 fw-semibold">
+                                <i class="bi bi-whatsapp me-1"></i> Book via WhatsApp
+                            </a>
                         </div>
 
                         <div class="text-center mt-3 small text-muted">

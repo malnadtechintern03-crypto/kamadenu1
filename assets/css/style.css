@@ -2433,15 +2433,39 @@ html {
   display: inline-block;
 }
 
+/* ==============================================================================
+   LUXURY TOP SCROLL PROGRESS BAR
+   ============================================================================== */
+#globalScrollProgressBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #ff7a00, #ffb300, #ffe082, #ffb300);
+  background-size: 200% 100%;
+  animation: shimmerWave 3s linear infinite;
+  box-shadow: 0 0 12px rgba(255, 179, 0, 0.8), 0 0 4px #ff7a00;
+  z-index: 9999;
+  pointer-events: none;
+  transition: width 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* Gleaming Button Animation */
 .btn-gold,
-.btn-saffron {
+.btn-saffron,
+.btn-forest,
+.btn-success {
   position: relative;
   overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.3s ease !important;
 }
 
 .btn-gold::after,
-.btn-saffron::after {
+.btn-saffron::after,
+.btn-success::after {
   content: '';
   position: absolute;
   top: -50%;
@@ -2455,51 +2479,69 @@ html {
     rgba(255, 255, 255, 0) 100%
   );
   transform: rotate(25deg);
-  animation: buttonGleam 4.5s ease-in-out infinite;
+  animation: buttonGleam 4s ease-in-out infinite;
   pointer-events: none;
 }
 
+.btn-gold:hover,
+.btn-saffron:hover,
+.btn-success:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(233, 120, 58, 0.32) !important;
+}
+
 /* ------------------------------------------------------------------------------
-   3. UNIVERSAL SCROLL REVEAL ENGINE ([data-animate])
+   3. UNIVERSAL ULTRA-SMOOTH SCROLL REVEAL ENGINE ([data-animate])
    ------------------------------------------------------------------------------ */
 [data-animate] {
   opacity: 0;
   will-change: transform, opacity, filter;
-  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.9s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 0.9s cubic-bezier(0.19, 1, 0.22, 1),
+              filter 0.9s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 [data-animate="fade-up"] {
-  transform: translate3d(0, 45px, 0);
+  transform: translate3d(0, 42px, 0) scale(0.975);
+  filter: blur(6px);
 }
 
 [data-animate="fade-down"] {
-  transform: translate3d(0, -45px, 0);
+  transform: translate3d(0, -42px, 0) scale(0.975);
+  filter: blur(6px);
 }
 
 [data-animate="fade-left"] {
-  transform: translate3d(50px, 0, 0);
+  transform: translate3d(48px, 0, 0) scale(0.98);
+  filter: blur(6px);
 }
 
 [data-animate="fade-right"] {
-  transform: translate3d(-50px, 0, 0);
+  transform: translate3d(-48px, 0, 0) scale(0.98);
+  filter: blur(6px);
 }
 
 [data-animate="zoom-in"] {
-  transform: scale3d(0.9, 0.9, 0.9) translate3d(0, 20px, 0);
+  transform: scale3d(0.92, 0.92, 0.92) translate3d(0, 24px, 0);
+  filter: blur(8px);
 }
 
 [data-animate="flip-up"] {
-  transform: perspective(1000px) rotateX(25deg) translate3d(0, 30px, 0);
+  transform: perspective(1200px) rotateX(20deg) translate3d(0, 36px, 0) scale(0.96);
+  filter: blur(5px);
 }
 
 [data-animate="blur-in"] {
-  filter: blur(10px);
-  transform: scale(0.96);
+  filter: blur(14px);
+  transform: scale(0.95);
 }
 
-/* Stagger Delays */
+[data-animate="luxury-slide"] {
+  transform: translate3d(0, 50px, 0) scale(0.95);
+  filter: blur(8px);
+}
+
+/* Stagger Delays with Smooth Stagger */
 [data-delay="50"]  { transition-delay: 0.05s; }
 [data-delay="80"]  { transition-delay: 0.08s; }
 [data-delay="100"] { transition-delay: 0.10s; }
@@ -2523,41 +2565,64 @@ html {
 /* ------------------------------------------------------------------------------
    4. INTERACTIVE 3D CARDS, GLOW BORDERS & SHEEN EFFECTS
    ------------------------------------------------------------------------------ */
+.tilt-card,
 .stat-card,
 .cow-card,
 .seva-program-card,
 .preset-giving-card,
 .journey-step-card,
 .testimonial-card,
-.transparency-card {
+.product-card,
+.heritage-card,
+.breed-card,
+.transparency-card,
+.admin-action-card {
   position: relative;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
               border-color 0.4s ease;
   will-change: transform, box-shadow;
+  transform-style: preserve-3d;
 }
 
-/* Subtle Specular Sheen Pass on Card Hover */
-.cow-card::after,
-.seva-program-card::after,
-.stat-card::after {
+.cow-card:hover,
+.seva-program-card:hover,
+.product-card:hover,
+.heritage-card:hover,
+.breed-card:hover,
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.015);
+  box-shadow: 0 24px 50px -10px rgba(16, 47, 50, 0.22), 0 0 25px rgba(255, 179, 0, 0.15) !important;
+  border-color: rgba(255, 179, 0, 0.5) !important;
+}
+
+/* 3D Dynamic Specular Light Follow */
+.tilt-card::before,
+.cow-card::before,
+.seva-program-card::before,
+.product-card::before,
+.stat-card::before {
   content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(233, 120, 58, 0.08),
-    transparent 40%
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 215, 0, 0.14),
+    rgba(233, 120, 58, 0.05) 40%,
+    transparent 70%
   );
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.3s ease;
   pointer-events: none;
   border-radius: inherit;
+  z-index: 2;
 }
 
-.cow-card:hover::after,
-.seva-program-card:hover::after,
-.stat-card:hover::after {
+.tilt-card:hover::before,
+.cow-card:hover::before,
+.seva-program-card:hover::before,
+.product-card:hover::before,
+.stat-card:hover::before {
   opacity: 1;
 }
 

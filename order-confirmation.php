@@ -169,7 +169,19 @@ require_once __DIR__ . '/includes/header.php';
                 <div>
                     Thank you for choosing pure Vedic products from Kamadenu Goushala!
                 </div>
-                <div class="d-print-none">
+                <div class="d-print-none d-flex gap-2">
+                    <?php
+                        $orderWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                        $cleanOrderWaPhone = preg_replace('/\D/', '', $orderWaPhone);
+                        $orderWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                      "I have placed Order #" . $order['order_number'] . " for *" . format_inr($order['total_amount']) . "*.\n" .
+                                      "Customer Name: " . $order['customer_name'] . "\n\n" .
+                                      "Please share courier tracking link and delivery updates.";
+                        $orderWaUrl = "https://wa.me/" . $cleanOrderWaPhone . "?text=" . rawurlencode($orderWaMsg);
+                    ?>
+                    <a href="<?= e($orderWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm rounded-pill">
+                        <i class="bi bi-whatsapp me-1"></i> WhatsApp Tracking
+                    </a>
                     <a href="<?= BASE_URL; ?>/products.php" class="btn btn-outline-forest btn-sm rounded-pill">
                         <i class="bi bi-arrow-left me-1"></i> Return to Store
                     </a>

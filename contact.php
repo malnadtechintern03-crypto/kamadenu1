@@ -154,9 +154,28 @@ require_once __DIR__ . '/includes/header.php';
                         </li>
                         <li class="d-flex gap-3">
                             <i class="bi bi-whatsapp text-success fs-5 flex-shrink-0"></i>
-                            <div>
-                                <strong class="text-forest-dark d-block">WhatsApp Seva Support:</strong>
-                                <a href="https://wa.me/919845012345" target="_blank" class="text-success text-decoration-none">+91 98450 12345 (Click to Chat)</a>
+                            <div class="w-100">
+                                <strong class="text-forest-dark d-block mb-1">WhatsApp Seva Lines & Desks:</strong>
+                                <?php 
+                                    $contactWaLines = get_whatsapp_numbers();
+                                    $contactWaMsg = get_setting('whatsapp_default_message', 'Namaste Kamadenu Goushala! I would like to inquire about Gau Seva.');
+                                    foreach ($contactWaLines as $cLine):
+                                        $cClean = preg_replace('/\D/', '', $cLine['phone']);
+                                        $cUrl = 'https://wa.me/' . $cClean . '?text=' . urlencode($contactWaMsg);
+                                ?>
+                                    <div class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+                                        <div>
+                                            <span class="small fw-semibold text-forest-dark"><?= e($cLine['label']); ?></span>
+                                            <small class="text-muted d-block extra-small"><?= e($cLine['phone']); ?></small>
+                                        </div>
+                                        <a href="<?= e($cUrl); ?>" target="_blank" rel="noopener" class="btn btn-xs btn-outline-success rounded-pill px-2 py-0" title="Chat on WhatsApp">
+                                            <i class="bi bi-whatsapp me-1"></i> Chat
+                                        </a>
+                                    </div>
+                                <?php endforeach; ?>
+                                <?php if (!empty(get_setting('whatsapp_hours'))): ?>
+                                    <small class="text-muted d-block extra-small mt-1"><i class="bi bi-clock me-1"></i>Hours: <?= e(get_setting('whatsapp_hours')); ?></small>
+                                <?php endif; ?>
                             </div>
                         </li>
                         <li class="d-flex gap-3">
@@ -169,20 +188,54 @@ require_once __DIR__ . '/includes/header.php';
                     </ul>
                 </div>
 
-                <!-- Darshan Hours Card -->
-                <div class="card p-4 rounded-4 bg-forest-dark text-white border-0 shadow-md mb-4">
-                    <h3 class="h5 font-serif text-gold mb-3"><i class="bi bi-clock-history me-2"></i> Daily Darshan & Seva Hours</h3>
-                    <div class="d-flex justify-content-between pb-2 border-bottom border-secondary border-opacity-50 small">
-                        <span><i class="bi bi-sun-fill text-gold me-1"></i> Morning Gau Aarti & Darshan</span>
-                        <strong class="text-cream">6:30 AM – 11:30 AM</strong>
+                <!-- Dynamic Darshan & Visiting Hours Card -->
+                <?php $contactTimings = get_goushala_timings(); ?>
+                <div class="card p-4 rounded-4 text-white shadow-md mb-4" style="background: linear-gradient(145deg, #18281e 0%, #0d1a13 100%); border: 1.5px solid rgba(255, 179, 0, 0.45); box-shadow: 0 8px 24px rgba(230, 81, 0, 0.18);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="h5 font-serif text-gold mb-0"><i class="bi bi-clock-history text-gold me-2"></i> Daily Darshan & Seva Hours</h3>
+                        <span class="badge rounded-pill px-3 py-1 small fw-bold shadow-xs" style="background: linear-gradient(135deg, #ff7a00 0%, #e65100 100%); color: #ffffff;">
+                            <?= e($contactTimings['status_text']); ?>
+                        </span>
                     </div>
-                    <div class="d-flex justify-content-between pt-2 small">
-                        <span><i class="bi bi-sunset-fill text-gold me-1"></i> Evening Pasture & Puja</span>
-                        <strong class="text-cream">4:00 PM – 7:00 PM</strong>
+                    <div class="d-flex justify-content-between align-items-center pb-2 mb-2 border-bottom" style="border-color: rgba(255, 179, 0, 0.2) !important;">
+                        <span class="d-flex align-items-center text-white small">
+                            <span class="rounded-circle p-1 me-2 d-flex align-items-center justify-content-center" style="background: rgba(255, 107, 0, 0.2); width: 26px; height: 26px;">
+                                <i class="bi bi-sun-fill" style="color: #ff9100;"></i>
+                            </span>
+                            <strong class="text-white">Morning Darshan:</strong>
+                        </span>
+                        <span class="badge font-monospace fw-bold fs-6 px-3 py-1 shadow-xs" style="background: linear-gradient(135deg, #ff7a00 0%, #e65100 100%); color: #ffffff; border: 1px solid #ffa726;">
+                            <?= e($contactTimings['morning']); ?>
+                        </span>
                     </div>
-                    <div class="small text-cream opacity-75 mt-3">
-                        <i class="bi bi-check2-circle text-gold me-1"></i> Open on all 365 days including Sundays and National Holidays.
+                    <div class="d-flex justify-content-between align-items-center pb-2 mb-2 border-bottom" style="border-color: rgba(255, 179, 0, 0.2) !important;">
+                        <span class="d-flex align-items-center text-white small">
+                            <span class="rounded-circle p-1 me-2 d-flex align-items-center justify-content-center" style="background: rgba(255, 179, 0, 0.2); width: 26px; height: 26px;">
+                                <i class="bi bi-sunset-fill" style="color: #ffb300;"></i>
+                            </span>
+                            <strong class="text-white">Evening Darshan:</strong>
+                        </span>
+                        <span class="badge font-monospace fw-bold fs-6 px-3 py-1 shadow-xs" style="background: linear-gradient(135deg, #ffb300 0%, #f57f17 100%); color: #122016; border: 1px solid #ffd54f;">
+                            <?= e($contactTimings['evening']); ?>
+                        </span>
                     </div>
+                    <div class="p-2 px-3 rounded-3 small my-2 d-flex align-items-center gap-2" style="background: rgba(230, 81, 0, 0.15); border: 1px solid rgba(255, 179, 0, 0.4); color: #ffe082;">
+                        <i class="bi bi-bell-fill fs-6 flex-shrink-0" style="color: #ffb300;"></i>
+                        <span class="fw-semibold"><?= e($contactTimings['aarti']); ?></span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="badge px-3 py-1 shadow-xs" style="background: #0f3d2a; color: #a3e635; border: 1px solid rgba(163, 230, 53, 0.4);">
+                            <i class="bi bi-calendar-check-fill me-1"></i> <?= e($contactTimings['days']); ?>
+                        </span>
+                        <span class="extra-small fw-semibold" style="color: #ffd54f;">
+                            <i class="bi bi-flower1 me-1"></i> Free Darshan & Parikrama
+                        </span>
+                    </div>
+                    <?php if (!empty($contactTimings['note'])): ?>
+                        <div class="extra-small text-cream opacity-85 mt-3 pt-2 border-top border-white border-opacity-10 fst-italic">
+                            <?= e($contactTimings['note']); ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Interactive Google Map Frame -->

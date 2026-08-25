@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initAdminLiveClock();
     initGoldenParticles('adminHeroParticles');
     initCircleProgress();
+    initAdminInteractive3DTilt();
+    initAdminMagneticButtons();
 });
 
 /**
@@ -222,6 +224,85 @@ function initCircleProgress() {
         setTimeout(() => {
             bar.style.strokeDashoffset = offset.toString();
         }, 300);
+    });
+}
+
+/**
+ * Interactive 3D Perspective Tilt on Admin Metric & Action Cards
+ */
+function initAdminInteractive3DTilt() {
+    const cards = document.querySelectorAll('.luminous-kpi-card, .admin-action-card, .admin-card-animate');
+    if (cards.length === 0 || window.innerWidth < 992) return;
+
+    cards.forEach(card => {
+        let isHovered = false;
+        let currentX = 0;
+        let currentY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        let animId = null;
+
+        const updateTilt = () => {
+            if (!isHovered) return;
+            currentX += (targetX - currentX) * 0.12;
+            currentY += (targetY - currentY) * 0.12;
+            card.style.transform = `perspective(1000px) rotateX(${currentY.toFixed(2)}deg) rotateY(${currentX.toFixed(2)}deg) translateY(-6px)`;
+            animId = requestAnimationFrame(updateTilt);
+        };
+
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            targetX = ((x - centerX) / centerX) * 5;
+            targetY = ((y - centerY) / centerY) * -5;
+
+            if (!isHovered) {
+                isHovered = true;
+                animId = requestAnimationFrame(updateTilt);
+            }
+        });
+
+        card.addEventListener('mouseleave', () => {
+            isHovered = false;
+            if (animId) cancelAnimationFrame(animId);
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
+            card.style.transition = 'transform 0.5s cubic-bezier(0.19, 1, 0.22, 1)';
+        });
+
+        card.addEventListener('mouseenter', () => {
+            card.style.transition = 'none';
+            isHovered = true;
+        });
+    });
+}
+
+/**
+ * Magnetic Micro-Interactions on Admin Primary Buttons
+ */
+function initAdminMagneticButtons() {
+    const btns = document.querySelectorAll('.btn-gold, .btn-forest');
+    if (btns.length === 0 || window.innerWidth < 992) return;
+
+    btns.forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px) scale(1.02)`;
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = 'translate(0px, 0px) scale(1)';
+            btn.style.transition = 'transform 0.4s cubic-bezier(0.19, 1, 0.22, 1)';
+        });
+
+        btn.addEventListener('mouseenter', () => {
+            btn.style.transition = 'none';
+        });
     });
 }
 

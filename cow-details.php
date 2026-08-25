@@ -42,19 +42,26 @@ $healthClass = match($cow['health_status']) {
 $ageFormatted = calculate_cow_age($cow['date_of_birth']);
 ?>
 
-<!-- Breadcrumb Header -->
-<div class="bg-cream border-bottom py-3">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/index.php" class="text-forest">Home</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/cows.php" class="text-forest">Cows</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/breeds.php?slug=<?= e($cow['breed_slug']); ?>" class="text-forest"><?= e($cow['breed_name']); ?></a></li>
-                <li class="breadcrumb-item active" aria-current="page"><?= e($cow['name']); ?></li>
-            </ol>
-        </nav>
+
+<?php if (is_logged_in() && has_role(['super_admin', 'admin', 'manager', 'editor'])): ?>
+<!-- Admin Quick Bar for Logged-in Admins -->
+<div class="bg-forest-dark text-white py-2 border-bottom border-warning border-opacity-25 sticky-top shadow-sm" style="z-index: 1020;">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2 small">
+            <span class="badge bg-gold text-forest-dark fw-bold"><i class="bi bi-shield-lock-fill me-1"></i> Admin Panel Access</span>
+            <span class="text-cream opacity-90">Viewing Cow: <strong><?= e($cow['name']); ?></strong> (<span class="font-monospace text-gold"><?= e($cow['cow_code']); ?></span>)</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="<?= ADMIN_URL; ?>/cow-edit.php?id=<?= $cow['id']; ?>" class="btn btn-gold btn-sm rounded-pill px-3 fw-bold shadow-xs">
+                <i class="bi bi-pencil-square me-1"></i> Edit This Cow in Admin Panel
+            </a>
+            <a href="<?= ADMIN_URL; ?>/cows.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                <i class="bi bi-grid me-1"></i> Cows Directory
+            </a>
+        </div>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- Main Cow Profile Section -->
 <section class="py-5 bg-white">
@@ -132,12 +139,19 @@ $ageFormatted = calculate_cow_age($cow['date_of_birth']);
 
             <!-- Right Column: Biography & Adoption Action Box -->
             <div class="col-lg-6">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge bg-gold-subtle text-gold-dark px-3 py-1 rounded-pill fw-bold">
-                        <i class="bi bi-flower1 me-1"></i> <?= e($cow['breed_name']); ?> Cow
-                    </span>
-                    <?php if ($cow['is_featured']): ?>
-                        <span class="badge bg-forest text-white px-2 py-1 rounded-pill small"><i class="bi bi-star-fill me-1"></i> Featured Resident</span>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-gold-subtle text-gold-dark px-3 py-1 rounded-pill fw-bold">
+                            <i class="bi bi-flower1 me-1"></i> <?= e($cow['breed_name']); ?> Cow
+                        </span>
+                        <?php if ($cow['is_featured']): ?>
+                            <span class="badge bg-forest text-white px-2 py-1 rounded-pill small"><i class="bi bi-star-fill me-1"></i> Featured Resident</span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (is_logged_in() && has_role(['super_admin', 'admin', 'manager', 'editor'])): ?>
+                    <a href="<?= ADMIN_URL; ?>/cow-edit.php?id=<?= $cow['id']; ?>" class="btn btn-outline-forest btn-sm rounded-pill px-3 fw-bold">
+                        <i class="bi bi-pencil-square me-1"></i> Edit Cow (Admin)
+                    </a>
                     <?php endif; ?>
                 </div>
 
@@ -181,6 +195,23 @@ $ageFormatted = calculate_cow_age($cow['date_of_birth']);
                                 </a>
                             </div>
                         </div>
+
+                        <!-- Direct WhatsApp Seva Inquiry -->
+                        <?php
+                            $cowWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                            $cleanCowWaPhone = preg_replace('/\D/', '', $cowWaPhone);
+                            $cowProfileUrl = BASE_URL . '/cow-details.php?slug=' . urlencode($cow['slug']);
+                            $cowWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                        "I would like to inquire about adopting / sponsoring:\n" .
+                                        "🐄 *Gau Mata:* " . $cow['name'] . " (ID: " . $cow['cow_code'] . ")\n" .
+                                        "🏷️ *Breed:* " . $cow['breed_name'] . " (" . ucfirst($cow['gender']) . ")\n" .
+                                        "🔗 *Profile Link:* " . $cowProfileUrl . "\n\n" .
+                                        "Please share adoption procedure and visit timings.";
+                            $cowWaUrl = "https://wa.me/" . $cleanCowWaPhone . "?text=" . rawurlencode($cowWaMsg);
+                        ?>
+                        <a href="<?= e($cowWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-success btn-sm w-100 rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center gap-2 mt-2">
+                            <i class="bi bi-whatsapp fs-6"></i> Inquire / Adopt via WhatsApp
+                        </a>
                     </div>
                 </div>
 
@@ -341,10 +372,14 @@ $ageFormatted = calculate_cow_age($cow['date_of_birth']);
             <?php foreach ($cow['related_cows'] as $rel): ?>
             <div class="col-md-6 col-lg-3">
                 <div class="heritage-card h-100 d-flex flex-column">
-                    <div class="position-relative" style="height: 180px; background-color: var(--color-forest-dark);">
-                        <div class="w-100 h-100 d-flex align-items-center justify-content-center text-gold fs-2 bg-forest-subtle">
-                            <i class="bi bi-flower1"></i>
-                        </div>
+                    <div class="position-relative overflow-hidden" style="height: 180px; background-color: var(--color-forest-dark);">
+                        <?php $relImage = image_url($rel['main_image'] ?? null, 'cows', 'placeholder-cow.jpg'); ?>
+                        <img 
+                            src="<?= e($relImage); ?>" 
+                            alt="<?= e($rel['name']); ?>" 
+                            class="w-100 h-100 object-fit-cover d-block"
+                            onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-cow.jpg';"
+                        >
                         <span class="position-absolute bottom-0 start-0 m-2 badge bg-black bg-opacity-75 text-white small">
                             <?= e($rel['cow_code']); ?>
                         </span>

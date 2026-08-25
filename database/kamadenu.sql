@@ -463,6 +463,8 @@ CREATE TABLE `products` (
   `stock_quantity` INT NOT NULL DEFAULT 0,
   `unit` VARCHAR(30) DEFAULT '500ml',
   `main_image` VARCHAR(255) DEFAULT NULL,
+  `whatsapp_number` VARCHAR(50) DEFAULT NULL,
+  `whatsapp_message` TEXT DEFAULT NULL,
   `is_featured` TINYINT(1) DEFAULT 0,
   `is_active` TINYINT(1) DEFAULT 1,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

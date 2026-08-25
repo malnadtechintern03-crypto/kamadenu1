@@ -76,9 +76,14 @@ declare(strict_types=1);
                     <i class="bi bi-telephone-fill text-gold me-2"></i>
                     <a href="tel:<?= e(get_setting('site_phone', '+919845012345')); ?>" class="text-cream"><?= e(get_setting('site_phone', '+91 98450 12345')); ?></a>
                 </p>
-                <p class="small text-cream opacity-75 mb-3">
+                <p class="small text-cream opacity-75 mb-2">
                     <i class="bi bi-envelope-fill text-gold me-2"></i>
                     <a href="mailto:<?= e(get_setting('site_email', 'seva@kamadenugoushala.org')); ?>" class="text-cream"><?= e(get_setting('site_email', 'seva@kamadenugoushala.org')); ?></a>
+                </p>
+                <?php $footTimings = get_goushala_timings(); ?>
+                <p class="small text-cream opacity-75 mb-3">
+                    <i class="bi bi-clock-history text-gold me-2"></i>
+                    <span><strong>Darshan:</strong> <?= e($footTimings['morning']); ?> &bull; <?= e($footTimings['evening']); ?></span>
                 </p>
 
                 <div class="p-2 rounded bg-black bg-opacity-25 border border-secondary border-opacity-25">
@@ -106,14 +111,67 @@ declare(strict_types=1);
             </div>
         </div>
     </div>
+<?php if (get_setting('enable_whatsapp_floating', '1') === '1'): 
+    $allWaLines = get_whatsapp_numbers();
+    $primaryWaNumber = preg_replace('/\D/', '', get_primary_whatsapp_number());
+    $waDefaultMsg = get_setting('whatsapp_default_message', 'Namaste Kamadenu Goushala! I would like to inquire about Gau Seva.');
+    $primaryWaUrl = 'https://wa.me/' . $primaryWaNumber . (!empty($waDefaultMsg) ? ('?text=' . urlencode($waDefaultMsg)) : '');
+?>
 <!-- Floating WhatsApp Action Widget (Available on All Pages) -->
-<a href="https://wa.me/<?= preg_replace('/\D/', '', get_setting('site_whatsapp', '919845012345')); ?>" 
-   class="floating-whatsapp-btn" 
-   target="_blank" 
-   rel="noopener" 
-   title="Chat with Seva Desk on WhatsApp">
-    <i class="bi bi-whatsapp"></i>
-</a>
+<?php if (count($allWaLines) > 1): ?>
+    <button type="button" class="floating-whatsapp-btn border-0 cursor-pointer" data-bs-toggle="modal" data-bs-target="#whatsappQuickHelpModal" title="Connect with Sanctuary on WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+    </button>
+<?php else: ?>
+    <a href="<?= e($primaryWaUrl); ?>" class="floating-whatsapp-btn" target="_blank" rel="noopener" title="Chat with Seva Desk on WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+<?php endif; ?>
+
+<!-- WhatsApp Multi-Department Routing Modal -->
+<div class="modal fade" id="whatsappQuickHelpModal" tabindex="-1" aria-labelledby="waHelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <div class="modal-header bg-forest-dark text-white border-0 py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-whatsapp text-success fs-4"></i>
+                    <div>
+                        <h5 class="modal-title font-serif fs-6 mb-0 text-gold" id="waHelpModalLabel">Connect on WhatsApp</h5>
+                        <small class="text-cream opacity-75 extra-small">Select a department to chat</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white small" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3 bg-cream-soft">
+                <div class="d-flex flex-column gap-2">
+                    <?php foreach ($allWaLines as $line): 
+                        $cleanLineNum = preg_replace('/\D/', '', $line['phone']);
+                        $deptUrl = 'https://wa.me/' . $cleanLineNum . '?text=' . urlencode("Namaste Kamadenu Goushala! I am connecting regarding {$line['label']}.");
+                    ?>
+                    <a href="<?= e($deptUrl); ?>" target="_blank" rel="noopener" class="p-3 bg-white rounded-3 border d-flex align-items-center justify-content-between text-decoration-none shadow-xs transition-all hover-translate">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="stat-icon-wrapper rounded-circle p-2 bg-success-subtle text-success" style="width:34px;height:34px;font-size:1rem;display:flex;align-items:center;justify-content:center;">
+                                <i class="bi bi-whatsapp"></i>
+                            </div>
+                            <div>
+                                <span class="small fw-bold text-forest-dark d-block"><?= e($line['label']); ?></span>
+                                <span class="extra-small text-muted font-monospace"><?= e($line['phone']); ?></span>
+                            </div>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted small"></i>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+                <?php if (!empty(get_setting('whatsapp_hours'))): ?>
+                    <div class="text-center mt-3 pt-2 border-top">
+                        <small class="text-muted extra-small"><i class="bi bi-clock me-1"></i>Hours: <?= e(get_setting('whatsapp_hours')); ?></small>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- Bootstrap 5.3 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

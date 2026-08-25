@@ -6,6 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   initStickyNavbar();
   initMobileNav();
+  initScrollProgressBar();
   initAnimatedCounters();
   initScrollAnimations();
   initRippleEffects();
@@ -13,10 +14,34 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
   initTooltips();
   initGoldenParticles('heroParticlesCanvas');
+  initGoldenParticles('adminHeroParticles');
   initCarouselProgress();
   initInteractive3DTilt();
+  initMagneticButtons();
   initCircleProgress();
 });
+
+/**
+ * Global Luxury Top Scroll Progress Bar
+ */
+function initScrollProgressBar() {
+  let progressBar = document.getElementById('globalScrollProgressBar');
+  if (!progressBar) {
+    progressBar = document.createElement('div');
+    progressBar.id = 'globalScrollProgressBar';
+    document.body.appendChild(progressBar);
+  }
+
+  const updateScrollProgress = () => {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = Math.min(scrollPercent, 100) + '%';
+  };
+
+  window.addEventListener('scroll', updateScrollProgress, { passive: true });
+  updateScrollProgress();
+}
 
 /**
  * Mobile Navigation Drawer Utilities
@@ -116,13 +141,14 @@ function initScrollAnimations() {
     '.preset-giving-card', '.testimonial-card', '.transparency-card',
     '.donor-tier-card', '.accordion-item', '.video-card', '.contact-info-card',
     '.donation-box', '.receipt-card', '.cart-summary-card', '.blog-card-img',
-    '.legal-content h3', '.breed-card'
+    '.legal-content h3', '.breed-card', '.admin-action-card', '.section-tag',
+    '.metric-card', '.quick-action-card', '.table-responsive'
   ].join(', ');
 
   document.querySelectorAll(targetSelectors).forEach((el, index) => {
     if (!el.hasAttribute('data-animate')) {
       el.setAttribute('data-animate', 'fade-up');
-      const delay = (index % 4) * 90 + 50;
+      const delay = (index % 4) * 80 + 50;
       el.setAttribute('data-delay', delay.toString());
     }
   });
@@ -138,8 +164,8 @@ function initScrollAnimations() {
       }
     });
   }, {
-    threshold: 0.12,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: 0.08,
+    rootMargin: '0px 0px -40px 0px'
   });
 
   animElements.forEach(el => animObserver.observe(el));
@@ -444,10 +470,25 @@ function initCarouselProgress() {
  * Interactive 3D Card Mouse Perspective Tilt & Dynamic Specular Sheen
  */
 function initInteractive3DTilt() {
-  const cards = document.querySelectorAll('.tilt-card, .cow-card, .stat-card, .preset-giving-card, .seva-program-card, .journey-step-card');
+  const cards = document.querySelectorAll('.tilt-card, .cow-card, .stat-card, .preset-giving-card, .seva-program-card, .journey-step-card, .product-card, .heritage-card, .breed-card, .testimonial-card, .transparency-card, .admin-action-card, .contact-info-card');
   if (cards.length === 0 || window.innerWidth < 992) return;
 
   cards.forEach(card => {
+    let isHovered = false;
+    let currentX = 0;
+    let currentY = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let animationFrameId = null;
+
+    const updateTilt = () => {
+      if (!isHovered) return;
+      currentX += (targetX - currentX) * 0.12;
+      currentY += (targetY - currentY) * 0.12;
+      card.style.transform = `perspective(1000px) rotateX(${currentY.toFixed(2)}deg) rotateY(${currentX.toFixed(2)}deg) translateY(-8px)`;
+      animationFrameId = requestAnimationFrame(updateTilt);
+    };
+
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -459,19 +500,51 @@ function initInteractive3DTilt() {
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      const rotateX = ((y - centerY) / centerY) * -5;
-      const rotateY = ((x - centerX) / centerX) * 5;
+      targetX = ((x - centerX) / centerX) * 6;
+      targetY = ((y - centerY) / centerY) * -6;
 
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+      if (!isHovered) {
+        isHovered = true;
+        animationFrameId = requestAnimationFrame(updateTilt);
+      }
     });
 
     card.addEventListener('mouseleave', () => {
+      isHovered = false;
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
       card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
-      card.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+      card.style.transition = 'transform 0.6s cubic-bezier(0.19, 1, 0.22, 1)';
     });
 
     card.addEventListener('mouseenter', () => {
-      card.style.transition = 'transform 0.1s ease-out';
+      card.style.transition = 'none';
+      isHovered = true;
+    });
+  });
+}
+
+/**
+ * Magnetic Button Interaction for Primary CTAs
+ */
+function initMagneticButtons() {
+  const magneticBtns = document.querySelectorAll('.btn-gold, .btn-saffron, .btn-forest, .btn-magnetic');
+  if (magneticBtns.length === 0 || window.innerWidth < 992) return;
+
+  magneticBtns.forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      btn.style.transform = `translate(${x * 0.22}px, ${y * 0.22}px) scale(1.02)`;
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'translate(0px, 0px) scale(1)';
+      btn.style.transition = 'transform 0.4s cubic-bezier(0.19, 1, 0.22, 1)';
+    });
+
+    btn.addEventListener('mouseenter', () => {
+      btn.style.transition = 'none';
     });
   });
 }

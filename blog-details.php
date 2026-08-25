@@ -54,19 +54,6 @@ $metaDescription = $post['excerpt'] ?? $post['title'];
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!-- Breadcrumb -->
-<div class="bg-cream border-bottom py-3">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/index.php" class="text-forest">Home</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/blog.php" class="text-forest">Blog</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/blog.php?category=<?= e($post['category_slug']); ?>" class="text-forest"><?= e($post['category_name']); ?></a></li>
-                <li class="breadcrumb-item active" aria-current="page"><?= e(mb_strimwidth($post['title'], 0, 40, '...')); ?></li>
-            </ol>
-        </nav>
-    </div>
-</div>
 
 <!-- Article Header Section -->
 <section class="py-5 bg-white border-bottom">
@@ -117,6 +104,22 @@ require_once __DIR__ . '/includes/header.php';
                             </a>
                         </div>
                     </div>
+                </div>
+
+                <!-- WhatsApp Share Bar -->
+                <?php
+                    $blogUrl = BASE_URL . '/blog-details.php?slug=' . urlencode($post['slug']);
+                    $blogShareMsg = "📖 *" . $post['title'] . "*\n\n" .
+                                    ($post['excerpt'] ? ($post['excerpt'] . "\n\n") : '') .
+                                    "Read this inspiring story from Kamadenu Goushala:\n" .
+                                    $blogUrl;
+                    $waShareUrl = "https://api.whatsapp.com/send?text=" . rawurlencode($blogShareMsg);
+                ?>
+                <div class="p-3 bg-white rounded-3 border d-flex justify-content-between align-items-center mb-4 shadow-xs">
+                    <span class="small fw-bold text-forest-dark"><i class="bi bi-share-fill text-gold me-2"></i> Share this inspiring story:</span>
+                    <a href="<?= e($waShareUrl); ?>" target="_blank" rel="noopener" class="btn btn-sm btn-success rounded-pill px-3 fw-semibold">
+                        <i class="bi bi-whatsapp me-1"></i> Share on WhatsApp
+                    </a>
                 </div>
 
                 <!-- Call to Action Banner -->

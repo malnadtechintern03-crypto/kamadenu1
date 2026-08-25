@@ -134,10 +134,23 @@ require_once __DIR__ . '/includes/header.php';
                             <span class="badge bg-gold text-forest-dark fw-bold">80G Tax Deductible</span>
                         </div>
 
-                        <div class="d-grid">
+                        <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-gold btn-lg rounded-pill py-3 fw-bold shadow-gold">
                                 <i class="bi bi-heart-fill me-1"></i> Offer Grāsa Dāna Now
                             </button>
+
+                            <?php
+                                $feedWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                                $cleanFeedWaPhone = preg_replace('/\D/', '', $feedWaPhone);
+                                $feedWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                             "I would like to book a special *Grāsa Dāna (Cow Feeding Seva)* for my family on an auspicious occasion / birthday / anniversary.\n" .
+                                             "🌾 *Seva:* Fresh Green Fodder & Jaggery Feeding\n\n" .
+                                             "Please share available dates and seva coordination details.";
+                                $feedWaUrl = "https://wa.me/" . $cleanFeedWaPhone . "?text=" . rawurlencode($feedWaMsg);
+                            ?>
+                            <a href="<?= e($feedWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm rounded-pill py-2 fw-semibold">
+                                <i class="bi bi-whatsapp me-1"></i> Book Special Date Feeding via WhatsApp
+                            </a>
                         </div>
                     </form>
                 </div>

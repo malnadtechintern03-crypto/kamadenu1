@@ -262,6 +262,26 @@ require_once __DIR__ . '/includes/header.php';
                         </li>
                     </ul>
                 </div>
+
+                <!-- Direct WhatsApp Adoption Desk -->
+                <?php
+                    $adoptWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                    $cleanAdoptWaPhone = preg_replace('/\D/', '', $adoptWaPhone);
+                    $adoptWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                  "I would like to adopt a sacred cow (Māsa Seva) under the Guardian Program.\n" .
+                                  "✨ *Monthly Seva:* ₹ 3,000 / month\n" .
+                                  "📜 *Includes:* Digital Certificate, 80G Tax Exemption & regular photo bulletins.\n\n" .
+                                  "Please guide me on how to proceed with the adoption.";
+                    $adoptWaUrl = "https://wa.me/" . $cleanAdoptWaPhone . "?text=" . rawurlencode($adoptWaMsg);
+                ?>
+                <div class="card p-4 rounded-4 bg-cream-soft border border-success border-opacity-50 text-center shadow-xs mb-4">
+                    <i class="bi bi-whatsapp text-success fs-2 mb-2"></i>
+                    <h4 class="h6 font-serif text-forest-dark mb-1">Prefer Adopting via WhatsApp?</h4>
+                    <p class="small text-muted mb-3">Connect directly with our Seva Desk to choose your cow and complete adoption formalities.</p>
+                    <a href="<?= e($adoptWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-success btn-sm rounded-pill w-100 fw-bold shadow-xs">
+                        <i class="bi bi-whatsapp me-1"></i> Chat with Adoption Desk
+                    </a>
+                </div>
             </div>
 
         </div>

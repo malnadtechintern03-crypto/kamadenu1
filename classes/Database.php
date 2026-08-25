@@ -48,6 +48,13 @@ class Database {
     }
 
     /**
+     * Alias for fetchColumn.
+     */
+    public static function fetchValue(string $sql, array $params = [], int $columnIndex = 0): mixed {
+        return self::fetchColumn($sql, $params, $columnIndex);
+    }
+
+    /**
      * Execute an INSERT, UPDATE, or DELETE query and return affected rows.
      */
     public static function execute(string $sql, array $params = []): int {

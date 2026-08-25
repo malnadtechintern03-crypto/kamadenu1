@@ -34,18 +34,6 @@ $metaDescription = 'Learn all about the ' . $breed['name'] . ' cow breed, origin
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!-- Breadcrumb -->
-<div class="bg-cream border-bottom py-3">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/index.php" class="text-forest">Home</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/breeds.php" class="text-forest">Breeds</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><?= e($breed['name']); ?></li>
-            </ol>
-        </nav>
-    </div>
-</div>
 
 <!-- Main Breed Profile Section -->
 <section class="py-5 bg-white">
@@ -93,6 +81,17 @@ require_once __DIR__ . '/includes/header.php';
                     </a>
                     <a href="<?= BASE_URL; ?>/donate.php?purpose=Conservation+of+<?= urlencode($breed['name']); ?>+Breed" class="btn btn-gold rounded-pill px-4">
                         <i class="bi bi-heart-fill me-1"></i> Support Breed Conservation
+                    </a>
+                    <?php
+                        $breedWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                        $cleanBreedWaPhone = preg_replace('/\D/', '', $breedWaPhone);
+                        $breedWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                      "I would like to inquire about the *" . $breed['name'] . "* Indigenous Cow Breed and meet the resident herd at Nandi Hills Sanctuary.\n\n" .
+                                      "Please share visiting timings and breed conservation seva details.";
+                        $breedWaUrl = "https://wa.me/" . $cleanBreedWaPhone . "?text=" . rawurlencode($breedWaMsg);
+                    ?>
+                    <a href="<?= e($breedWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success rounded-pill px-3">
+                        <i class="bi bi-whatsapp me-1"></i> Inquire on WhatsApp
                     </a>
                 </div>
             </div>

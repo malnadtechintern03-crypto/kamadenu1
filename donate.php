@@ -424,6 +424,24 @@ require_once __DIR__ . '/includes/header.php';
                     </p>
                     <small class="text-gold-light opacity-75">Your formal Form 10BE tax certificate will be emailed directly.</small>
                 </div>
+
+                <!-- WhatsApp Direct Seva Support -->
+                <?php
+                    $donateWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                    $cleanDonateWaPhone = preg_replace('/\D/', '', $donateWaPhone);
+                    $donateWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                   "I would like to contribute towards Gau Seva (80G Tax Exemption).\n" .
+                                   "Please share bank / UPI transfer assistance and official 80G receipt confirmation details.";
+                    $donateWaUrl = "https://wa.me/" . $cleanDonateWaPhone . "?text=" . rawurlencode($donateWaMsg);
+                ?>
+                <div class="card p-4 rounded-4 bg-white border border-success border-opacity-50 text-center shadow-xs mt-3">
+                    <i class="bi bi-whatsapp text-success fs-3 mb-2"></i>
+                    <h5 class="h6 font-serif text-forest-dark mb-1">Direct Seva Assistance</h5>
+                    <p class="small text-muted mb-3">Prefer offline NEFT/RTGS, Cheque, or need help with your 80G receipt?</p>
+                    <a href="<?= e($donateWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm rounded-pill w-100 fw-semibold">
+                        <i class="bi bi-whatsapp me-1"></i> Connect on WhatsApp
+                    </a>
+                </div>
             </div>
 
         </div>

@@ -13,6 +13,7 @@ require_once __DIR__ . '/includes/header.php';
 $totalCows = (int)Database::fetchColumn("SELECT COUNT(*) FROM cows WHERE status != 'deceased'");
 $treatmentCows = (int)Database::fetchColumn("SELECT COUNT(*) FROM cows WHERE health_status IN ('under_treatment', 'recovering', 'elderly_care') AND status != 'deceased'");
 $adoptedCows = (int)Database::fetchColumn("SELECT COUNT(*) FROM cows WHERE status = 'adopted'");
+$totalBreedsCount = (int)Database::fetchColumn("SELECT COUNT(DISTINCT breed_id) FROM cows WHERE status != 'deceased'") ?: (int)Database::fetchColumn("SELECT COUNT(*) FROM cow_breeds");
 
 $totalDonationsAmount = (float)Database::fetchColumn("SELECT COALESCE(SUM(amount), 0) FROM donations WHERE status = 'success'");
 $totalDonationsCount = (int)Database::fetchColumn("SELECT COUNT(*) FROM donations WHERE status = 'success'");
@@ -48,7 +49,30 @@ $recentMessages = Database::fetchAll("
     LIMIT 5
 ");
 
-$dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
+// Fetch Matriarch / Featured Cow dynamically for Dashboard Hero Card
+$matriarchCow = Database::fetchOne("
+    SELECT c.*, b.name AS breed_name 
+    FROM cows c 
+    LEFT JOIN cow_breeds b ON c.breed_id = b.id 
+    WHERE c.is_featured = 1 AND c.status != 'deceased'
+    ORDER BY c.id ASC 
+    LIMIT 1
+") ?: Database::fetchOne("
+    SELECT c.*, b.name AS breed_name 
+    FROM cows c 
+    LEFT JOIN cow_breeds b ON c.breed_id = b.id 
+    WHERE c.status != 'deceased'
+    ORDER BY c.id ASC 
+    LIMIT 1
+");
+
+$matriarchId = (int)($matriarchCow['id'] ?? 1);
+$matriarchName = $matriarchCow['name'] ?? 'Kamadhenu';
+$matriarchCode = $matriarchCow['cow_code'] ?? 'KG-2023-01';
+$matriarchBreed = $matriarchCow['breed_name'] ?? 'Gir';
+$dashboardCowImage = !empty($matriarchCow['main_image']) 
+    ? image_url($matriarchCow['main_image'], 'cows', 'placeholder-cow.jpg') 
+    : image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
 ?>
 
 <!-- Sanctuary Overview Welcome Card with Grand Particles & Live Ticker -->
@@ -57,10 +81,10 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
     <canvas id="adminHeroParticles" class="hero-particles-layer" style="opacity: 0.55;"></canvas>
 
     <div class="row g-0 align-items-center position-relative" style="z-index: 4;">
-        <div class="col-md-4 col-lg-3 position-relative" style="min-height: 240px; height: 100%;">
+        <div class="col-md-4 col-lg-3 position-relative" style="min-height: 250px; height: 100%;">
             <img 
                 src="<?= e($dashboardCowImage); ?>" 
-                alt="Kamadhenu - Sanctuary Matriarch" 
+                alt="<?= e($matriarchName); ?> - Sanctuary Matriarch" 
                 class="w-100 h-100 object-fit-cover position-absolute top-0 start-0"
                 style="border-top-left-radius: var(--radius-lg); border-bottom-left-radius: var(--radius-lg);"
                 onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-cow.jpg';"
@@ -70,10 +94,18 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
                     <i class="bi bi-patch-check-fill me-1"></i> Sanctuary Matriarch
                 </span>
             </div>
-            <div class="position-absolute bottom-0 start-0 m-3">
-                <span class="badge bg-black bg-opacity-75 text-white small">
-                    Kamadhenu (ID: KG-2023-01)
-                </span>
+            
+            <!-- Quick Edit Overlay on Photo -->
+            <div class="position-absolute bottom-0 start-0 end-0 p-3 d-flex align-items-end justify-content-between gap-2" style="background: linear-gradient(0deg, rgba(12,38,36,0.92) 0%, rgba(12,38,36,0.5) 60%, rgba(0,0,0,0) 100%);">
+                <div>
+                    <span class="badge bg-black bg-opacity-75 text-white small d-block mb-1 text-truncate" style="max-width: 140px;">
+                        <?= e($matriarchName); ?> (<?= e($matriarchCode); ?>)
+                    </span>
+                    <small class="text-gold-light extra-small"><?= e($matriarchBreed); ?> Breed</small>
+                </div>
+                <a href="<?= BASE_URL; ?>/admin/cow-edit.php?id=<?= $matriarchId; ?>" class="btn btn-gold btn-xs rounded-pill px-2 py-1 shadow-sm fw-bold text-nowrap" title="Edit <?= e($matriarchName); ?> Profile">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Cow
+                </a>
             </div>
         </div>
         <div class="col-md-8 col-lg-9 p-4 p-lg-5">
@@ -93,21 +125,49 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
                 Welcome back, <?= e($currentUser['name'] ?? 'Administrator'); ?>
             </h2>
             <p class="text-white-50 mb-4 max-w-700">
-                You are managing <strong><?= $totalCows; ?> resident indigenous cows</strong> across 6 sacred breeds, with <strong><?= $treatmentCows; ?> active clinical treatments</strong> and <strong><?= format_inr($totalDonationsAmount, true); ?></strong> in verified 80G philanthropic seva contributions.
+                You are managing <strong><?= $totalCows; ?> resident indigenous cows</strong> across <strong><?= $totalBreedsCount; ?> sacred breeds</strong>, with <strong><?= $treatmentCows; ?> active clinical treatments</strong> and <strong><?= format_inr($totalDonationsAmount, true); ?></strong> in verified 80G philanthropic seva contributions.
             </p>
             <div class="d-flex flex-wrap gap-2">
-                <a href="<?= BASE_URL; ?>/admin/cow-edit.php" class="btn btn-gold btn-sm rounded-pill px-3 shadow-gold">
-                    <i class="bi bi-plus-circle-fill me-1"></i> Register Rescued Cow
+                <a href="<?= BASE_URL; ?>/admin/cow-edit.php?id=<?= $matriarchId; ?>" class="btn btn-gold btn-sm rounded-pill px-3 shadow-gold">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Matriarch (<?= e($matriarchName); ?>)
                 </a>
-                <a href="<?= BASE_URL; ?>/admin/medical.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
-                    <i class="bi bi-heart-pulse-fill me-1"></i> Record Medical Entry
+                <a href="<?= BASE_URL; ?>/admin/cows.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="bi bi-card-checklist me-1"></i> Cows Directory
                 </a>
-                <a href="<?= BASE_URL; ?>/admin/donations.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
-                    <i class="bi bi-receipt-cutoff me-1"></i> 80G Donations Ledger
+                <a href="<?= BASE_URL; ?>/admin/cow-edit.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="bi bi-plus-circle-fill me-1"></i> Register New Cow
                 </a>
-                <a href="<?= BASE_URL; ?>/index.php" target="_blank" class="btn btn-outline-gold btn-sm rounded-pill px-3">
+                <a href="<?= BASE_URL; ?>/admin/settings.php" class="btn btn-outline-gold btn-sm rounded-pill px-3">
+                    <i class="bi bi-gear-fill me-1"></i> Edit Platform Settings
+                </a>
+                <a href="<?= BASE_URL; ?>/admin/hero.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="bi bi-sliders me-1"></i> Edit Hero Slides
+                </a>
+                <a href="<?= BASE_URL; ?>/index.php" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3">
                     <i class="bi bi-box-arrow-up-right me-1"></i> Live Portal
                 </a>
+            </div>
+
+            <!-- Live Goushala Darshan Timings & Status Indicator -->
+            <?php $dashTimings = get_goushala_timings(); ?>
+            <div class="mt-3 pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-3" style="border-color: rgba(255, 179, 0, 0.25) !important;">
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="badge rounded-pill px-3 py-1 fw-bold shadow-xs" style="background: linear-gradient(135deg, #ff7a00 0%, #e65100 100%); color: #ffffff;">
+                        <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> <?= e($dashTimings['status_text']); ?>
+                    </span>
+                    <span class="small text-white">
+                        <i class="bi bi-clock-history me-1" style="color: #ffb300;"></i> <strong class="text-white">Darshan Hours:</strong> 
+                        <span class="badge font-monospace px-2 py-0 ms-1" style="background: linear-gradient(135deg, #ff7a00 0%, #e65100 100%); color: #ffffff; border: 1px solid #ffa726;"><?= e($dashTimings['morning']); ?></span> &bull; 
+                        <span class="badge font-monospace px-2 py-0" style="background: linear-gradient(135deg, #ffb300 0%, #f57f17 100%); color: #122016; border: 1px solid #ffd54f;"><?= e($dashTimings['evening']); ?></span>
+                    </span>
+                    <span class="badge px-2 py-1 small shadow-xs" style="background: #0f3d2a; color: #a3e635; border: 1px solid rgba(163, 230, 53, 0.4);"><?= e($dashTimings['days']); ?></span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge extra-small px-2 py-1" style="background: rgba(230, 81, 0, 0.2); border: 1px solid rgba(255, 179, 0, 0.45); color: #ffe082;"><i class="bi bi-bell-fill me-1" style="color: #ffb300;"></i><?= e($dashTimings['aarti']); ?></span>
+                    <a href="<?= BASE_URL; ?>/admin/settings.php#visiting-hours-section" class="btn btn-xs rounded-pill px-3 py-1 fw-bold shadow-xs text-decoration-none" style="background: linear-gradient(135deg, #ffb300 0%, #f57f17 100%); color: #122016;" title="Edit Opening & Closing Timings">
+                        <i class="bi bi-pencil-square me-1"></i> Edit Timings
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -118,20 +178,26 @@ $dashboardCowImage = image_url('kamadhenu.jpg', 'cows', 'placeholder-cow.jpg');
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
         <div class="d-flex align-items-center gap-2">
             <span class="badge bg-gold text-forest-dark fw-bold px-3 py-1 rounded-pill grand-shimmer-badge">Quick Actions</span>
-            <span class="small text-muted">Direct management shortcuts:</span>
+            <span class="small text-muted">Direct management & editing shortcuts:</span>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a href="<?= BASE_URL; ?>/admin/cow-edit.php" class="btn btn-forest btn-sm rounded-pill">
-                <i class="bi bi-plus-circle me-1"></i> Register New Cow
+            <a href="<?= BASE_URL; ?>/admin/cow-edit.php?id=<?= $matriarchId; ?>" class="btn btn-gold btn-sm rounded-pill">
+                <i class="bi bi-pencil-square me-1"></i> Edit <?= e($matriarchName); ?>
             </a>
-            <a href="<?= BASE_URL; ?>/admin/medical.php" class="btn btn-outline-forest btn-sm rounded-pill">
-                <i class="bi bi-heart-pulse me-1"></i> Add Medical Log
+            <a href="<?= BASE_URL; ?>/admin/cows.php" class="btn btn-forest btn-sm rounded-pill">
+                <i class="bi bi-list-check me-1"></i> Manage Cows
             </a>
             <a href="<?= BASE_URL; ?>/admin/products.php" class="btn btn-outline-forest btn-sm rounded-pill">
-                <i class="bi bi-box-seam me-1"></i> Add Store Product
+                <i class="bi bi-box-seam me-1"></i> Store Products & Categories
             </a>
-            <a href="<?= BASE_URL; ?>/admin/expenses.php" class="btn btn-outline-forest btn-sm rounded-pill">
-                <i class="bi bi-receipt me-1"></i> Log Expense
+            <a href="<?= BASE_URL; ?>/admin/settings.php" class="btn btn-outline-success btn-sm rounded-pill">
+                <i class="bi bi-whatsapp me-1"></i> WhatsApp Helpline Settings
+            </a>
+            <a href="<?= BASE_URL; ?>/admin/hero.php" class="btn btn-outline-forest btn-sm rounded-pill">
+                <i class="bi bi-images me-1"></i> Edit Hero Slides
+            </a>
+            <a href="<?= BASE_URL; ?>/admin/settings.php" class="btn btn-outline-forest btn-sm rounded-pill">
+                <i class="bi bi-gear me-1"></i> Platform Settings
             </a>
         </div>
     </div>

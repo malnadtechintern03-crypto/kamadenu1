@@ -144,6 +144,25 @@ require_once __DIR__ . '/includes/header.php';
                             <a href="<?= BASE_URL; ?>/checkout.php" class="btn btn-gold btn-lg rounded-pill py-3 fw-bold shadow-gold">
                                 Proceed to Checkout <i class="bi bi-arrow-right ms-1"></i>
                             </a>
+
+                            <?php
+                                $cartWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                                $cleanCartWaPhone = preg_replace('/\D/', '', $cartWaPhone);
+                                $cartItemsText = [];
+                                foreach ($cart['items'] as $cItm) {
+                                    $cartItemsText[] = "• " . $cItm['name'] . " (" . $cItm['quantity'] . " × " . format_inr($cItm['price']) . ")";
+                                }
+                                $cartWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                             "I would like to order my shopping cart:\n" .
+                                             implode("\n", $cartItemsText) . "\n\n" .
+                                             "💰 *Cart Total:* " . format_inr($cart['grand_total']) . "\n\n" .
+                                             "Please share direct UPI payment instructions and delivery address collection.";
+                                $cartWaUrl = "https://wa.me/" . $cleanCartWaPhone . "?text=" . rawurlencode($cartWaMsg);
+                            ?>
+                            <a href="<?= e($cartWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm rounded-pill py-2 fw-semibold">
+                                <i class="bi bi-whatsapp me-1"></i> Order Cart via WhatsApp Direct
+                            </a>
+
                             <a href="<?= BASE_URL; ?>/products.php" class="btn btn-outline-forest btn-sm rounded-pill py-2">
                                 Continue Shopping
                             </a>

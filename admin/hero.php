@@ -9,7 +9,7 @@ require_once dirname(__DIR__) . '/config/app.php';
 require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/services/UploadService.php';
 
-require_role(['super_admin', 'admin', 'manager', 'editor']);
+require_role(['super_admin', 'admin', 'manager', 'editor', 'staff']);
 
 $currentUser = get_logged_in_user();
 

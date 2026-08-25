@@ -237,8 +237,23 @@ $hasActiveFilters = !empty($filters['search']) || !empty($filters['breed']) || !
                                             <a href="<?= BASE_URL; ?>/cow-details.php?slug=<?= e($cow['slug']); ?>" class="btn btn-outline-forest btn-sm rounded-pill flex-grow-1">
                                                 View Profile
                                             </a>
-                                            <a href="<?= BASE_URL; ?>/adopt.php?cow_id=<?= $cow['id']; ?>" class="btn btn-gold btn-sm rounded-pill px-3" title="Adopt or Sponsor this Cow">
+                                            <a href="<?= BASE_URL; ?>/adopt.php?cow_id=<?= $cow['id']; ?>" class="btn btn-gold btn-sm rounded-pill px-3" title="Adopt <?= e($cow['name']); ?>">
                                                 <i class="bi bi-heart-fill"></i>
+                                            </a>
+                                            <?php
+                                                $cowWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                                                $cleanCowWaPhone = preg_replace('/\D/', '', $cowWaPhone);
+                                                $cowProfileUrl = BASE_URL . '/cow-details.php?slug=' . urlencode($cow['slug']);
+                                                $cowWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                                            "I would like to inquire about adopting / sponsoring:\n" .
+                                                            "🐄 *Gau Mata:* " . $cow['name'] . " (" . $cow['cow_code'] . ")\n" .
+                                                            "🏷️ *Breed:* " . $cow['breed_name'] . "\n" .
+                                                            "🔗 *Profile Link:* " . $cowProfileUrl . "\n\n" .
+                                                            "Please share adoption seva details.";
+                                                $cowWaUrl = "https://wa.me/" . $cleanCowWaPhone . "?text=" . rawurlencode($cowWaMsg);
+                                            ?>
+                                            <a href="<?= e($cowWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm rounded-pill px-2" title="Inquire on WhatsApp about <?= e($cow['name']); ?>">
+                                                <i class="bi bi-whatsapp"></i>
                                             </a>
                                         </div>
                                     </div>

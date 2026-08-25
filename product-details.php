@@ -39,19 +39,6 @@ $saveAmount = $hasDiscount ? ($product['price'] - $product['discount_price']) : 
 $inStock = (int)$product['stock_quantity'] > 0;
 ?>
 
-<!-- Breadcrumb -->
-<div class="bg-cream border-bottom py-3">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/index.php" class="text-forest">Home</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/products.php" class="text-forest">Organic Products</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL; ?>/products.php?category=<?= e($product['category_slug']); ?>" class="text-forest"><?= e($product['category_name']); ?></a></li>
-                <li class="breadcrumb-item active" aria-current="page"><?= e($product['name']); ?></li>
-            </ol>
-        </nav>
-    </div>
-</div>
 
 <!-- Main Product Section -->
 <section class="py-5 bg-white">
@@ -128,22 +115,56 @@ $inStock = (int)$product['stock_quantity'] > 0;
                     <?= e($product['short_description'] ?? $product['description']); ?>
                 </p>
 
-                <!-- Quantity Stepper & Add to Cart Action -->
-                <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
-                    <div class="input-group" style="width: 140px;">
+                <!-- Quantity Stepper & Actions -->
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                    <div class="input-group" style="width: 130px;">
                         <button class="btn btn-outline-forest" type="button" id="btnQtyMinus"><i class="bi bi-dash"></i></button>
                         <input type="number" id="inputProductQty" class="form-control text-center fw-bold" value="1" min="1" max="<?= max(1, (int)$product['stock_quantity']); ?>">
                         <button class="btn btn-outline-forest" type="button" id="btnQtyPlus"><i class="bi bi-plus"></i></button>
                     </div>
 
-                    <button type="button" class="btn btn-gold btn-lg rounded-pill px-4 flex-grow-1 shadow-gold fw-bold" id="btnAddToCartMain" <?= !$inStock ? 'disabled' : ''; ?>>
-                        <i class="bi bi-cart-plus-fill me-2"></i> Add to Shopping Cart
+                    <button type="button" class="btn btn-gold btn-lg rounded-pill px-4 flex-grow-1 shadow-gold fw-bold" id="btnBuyNowMain" <?= !$inStock ? 'disabled' : ''; ?>>
+                        <i class="bi bi-bag-check-fill me-2"></i> Buy Now
                     </button>
                 </div>
 
-                <a href="<?= BASE_URL; ?>/cart.php" class="btn btn-outline-forest w-100 rounded-pill py-2">
-                    <i class="bi bi-bag-check me-1"></i> View Cart & Checkout
-                </a>
+                <div class="d-flex gap-2 mb-3">
+                    <button type="button" class="btn btn-outline-forest rounded-pill py-2 flex-grow-1" id="btnAddToCartMain" <?= !$inStock ? 'disabled' : ''; ?>>
+                        <i class="bi bi-cart-plus me-1"></i> Add to Shopping Cart
+                    </button>
+                    <a href="<?= BASE_URL; ?>/cart.php" class="btn btn-outline-secondary rounded-pill px-3 py-2" title="View Shopping Cart">
+                        <i class="bi bi-cart3"></i>
+                    </a>
+                </div>
+
+                <!-- Direct Order via WhatsApp Button with Preset Message -->
+                <?php
+                    $detailWaPhone = !empty($product['whatsapp_number']) ? $product['whatsapp_number'] : get_primary_whatsapp_number();
+                    $cleanDetailWaPhone = preg_replace('/\D/', '', $detailWaPhone);
+                    $detailPriceText = format_inr($effectivePrice);
+                    $detailUrl = BASE_URL . '/product-details.php?slug=' . urlencode($product['slug']);
+                    
+                    if (!empty($product['whatsapp_message'])) {
+                        $detailWaMsg = $product['whatsapp_message'];
+                    } else {
+                        $detailWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                      "I would like to order:\n" .
+                                      "🌿 *Product:* " . $product['name'] . "\n" .
+                                      "📦 *Unit:* " . $product['unit'] . "\n" .
+                                      "💰 *Price:* " . $detailPriceText . "\n" .
+                                      "🔗 *Product Link:* " . $detailUrl . "\n\n" .
+                                      "Please confirm stock availability and share payment/delivery instructions.";
+                    }
+                    $detailWaUrl = "https://wa.me/" . $cleanDetailWaPhone . "?text=" . rawurlencode($detailWaMsg);
+                ?>
+                <div class="mb-4">
+                    <a href="<?= e($detailWaUrl); ?>" id="btnWhatsAppOrderSingle" target="_blank" rel="noopener" class="btn btn-success btn-lg rounded-pill w-100 fw-bold shadow-xs d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-whatsapp fs-5"></i> Order via WhatsApp Direct
+                    </a>
+                    <small class="text-muted text-center d-block mt-1 extra-small">
+                        <i class="bi bi-shield-check me-1"></i>Connects to sanctuary order desk: <strong><?= e($detailWaPhone); ?></strong>
+                    </small>
+                </div>
 
             </div>
 
@@ -203,49 +224,119 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnPlus = document.getElementById('btnQtyPlus');
     const btnAdd = document.getElementById('btnAddToCartMain');
 
+    const btnWaSingle = document.getElementById('btnWhatsAppOrderSingle');
+    const baseWaUrl = 'https://wa.me/<?= $cleanDetailWaPhone; ?>';
+    const prodName = <?= json_encode($product['name']); ?>;
+    const prodUnit = <?= json_encode($product['unit']); ?>;
+    const prodPrice = <?= json_encode($effectivePrice); ?>;
+    const prodUrl = <?= json_encode($detailUrl); ?>;
+    const customMsgTemplate = <?= json_encode($product['whatsapp_message'] ?? ''); ?>;
+
+    function syncWaLink() {
+        if (!btnWaSingle) return;
+        const qty = parseInt(qtyInput.value, 10) || 1;
+        const totalPrice = (prodPrice * qty).toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+        
+        let msg = '';
+        if (customMsgTemplate && customMsgTemplate.trim().length > 0) {
+            msg = customMsgTemplate + (qty > 1 ? `\n📦 *Order Quantity:* ${qty} Units (Total: ${totalPrice})` : '');
+        } else {
+            msg = `🙏 *Namaste Kamadenu Goushala!*\n\nI would like to order:\n🌿 *Product:* ${prodName}\n📦 *Quantity:* ${qty} × ${prodUnit}\n💰 *Total Price:* ${totalPrice}\n🔗 *Product Link:* ${prodUrl}\n\nPlease confirm availability and share payment/delivery instructions.`;
+        }
+        btnWaSingle.href = baseWaUrl + '?text=' + encodeURIComponent(msg);
+    }
+
     btnMinus.addEventListener('click', () => {
         let val = parseInt(qtyInput.value, 10);
-        if (val > 1) qtyInput.value = val - 1;
+        if (val > 1) {
+            qtyInput.value = val - 1;
+            syncWaLink();
+        }
     });
 
     btnPlus.addEventListener('click', () => {
         let val = parseInt(qtyInput.value, 10);
         let max = parseInt(qtyInput.getAttribute('max') || '99', 10);
-        if (val < max) qtyInput.value = val + 1;
-    });
-
-    btnAdd.addEventListener('click', async function() {
-        const originalHtml = this.innerHTML;
-        this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Adding...';
-        this.disabled = true;
-
-        try {
-            const formData = new FormData();
-            formData.append('action', 'add');
-            formData.append('product_id', '<?= $product['id']; ?>');
-            formData.append('quantity', qtyInput.value);
-            formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-
-            const res = await fetch('<?= BASE_URL; ?>/ajax/products.php', {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                body: formData
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                showToast(data.message, 'success');
-            } else {
-                showToast(data.message || 'Could not add to cart.', 'danger');
-            }
-        } catch (err) {
-            console.error(err);
-            showToast('Failed to connect to cart service.', 'danger');
-        } finally {
-            this.innerHTML = originalHtml;
-            this.disabled = false;
+        if (val < max) {
+            qtyInput.value = val + 1;
+            syncWaLink();
         }
     });
+
+    qtyInput.addEventListener('input', syncWaLink);
+    syncWaLink();
+
+    const btnBuy = document.getElementById('btnBuyNowMain');
+    if (btnBuy) {
+        btnBuy.addEventListener('click', async function() {
+            const originalHtml = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Processing...';
+            this.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'add');
+                formData.append('product_id', '<?= $product['id']; ?>');
+                formData.append('quantity', qtyInput.value);
+                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+                const res = await fetch('<?= BASE_URL; ?>/ajax/products.php', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    window.location.href = '<?= BASE_URL; ?>/checkout.php';
+                } else {
+                    showToast(data.message || 'Could not process order.', 'danger');
+                    this.innerHTML = originalHtml;
+                    this.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to connect to checkout service.', 'danger');
+                this.innerHTML = originalHtml;
+                this.disabled = false;
+            }
+        });
+    }
+
+    if (btnAdd) {
+        btnAdd.addEventListener('click', async function() {
+            const originalHtml = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Adding...';
+            this.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'add');
+                formData.append('product_id', '<?= $product['id']; ?>');
+                formData.append('quantity', qtyInput.value);
+                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+                const res = await fetch('<?= BASE_URL; ?>/ajax/products.php', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message || 'Could not add to cart.', 'danger');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to connect to cart service.', 'danger');
+            } finally {
+                this.innerHTML = originalHtml;
+                this.disabled = false;
+            }
+        });
+    }
 });
 </script>
 

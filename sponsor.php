@@ -84,9 +84,24 @@ $seniorCows = Database::fetchAll("
                                     <?= e(mb_strimwidth($cow['rescue_story'] ?? $cow['description'] ?? '', 0, 100, '...')); ?>
                                 </p>
                                 <div class="pt-3 border-top mt-auto">
-                                    <a href="<?= BASE_URL; ?>/donate.php?cow_id=<?= $cow['id']; ?>&purpose=Senior+Sponsorship+for+<?= urlencode($cow['name']); ?>&amount=2501" class="btn btn-gold btn-sm rounded-pill w-100">
-                                        <i class="bi bi-shield-heart me-1"></i> Sponsor <?= e($cow['name']); ?> (₹ 2,501/mo)
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <a href="<?= BASE_URL; ?>/donate.php?cow_id=<?= $cow['id']; ?>&purpose=Senior+Sponsorship+for+<?= urlencode($cow['name']); ?>&amount=2501" class="btn btn-gold btn-sm rounded-pill flex-grow-1">
+                                            <i class="bi bi-shield-heart me-1"></i> Sponsor (₹ 2,501/mo)
+                                        </a>
+                                        <?php
+                                            $spWaPhone = get_setting('site_whatsapp', '+91 98450 12345');
+                                            $cleanSpWaPhone = preg_replace('/\D/', '', $spWaPhone);
+                                            $spWaMsg = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                                       "I would like to inquire about sponsoring Senior / Hospice Gau Mata:\n" .
+                                                       "🐄 *Name:* " . $cow['name'] . " (" . $cow['cow_code'] . ")\n" .
+                                                       "🩺 *Health Status:* " . ucfirst(str_replace('_', ' ', $cow['health_status'])) . "\n\n" .
+                                                       "Please share monthly medical & hospice care sponsorship details.";
+                                            $spWaUrl = "https://wa.me/" . $cleanSpWaPhone . "?text=" . rawurlencode($spWaMsg);
+                                        ?>
+                                        <a href="<?= e($spWaUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm rounded-pill px-2" title="Inquire on WhatsApp about sponsoring <?= e($cow['name']); ?>">
+                                            <i class="bi bi-whatsapp"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

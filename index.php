@@ -74,6 +74,26 @@ try {
         LIMIT 3
     ");
 
+    // 9. Featured Store Products for Homepage
+    $featuredProducts = Database::fetchAll("
+        SELECT p.*, pc.name AS category_name
+        FROM products p
+        JOIN product_categories pc ON p.category_id = pc.id
+        WHERE p.is_active = 1 AND p.is_featured = 1
+        ORDER BY p.id ASC
+        LIMIT 4
+    ");
+    if (empty($featuredProducts)) {
+        $featuredProducts = Database::fetchAll("
+            SELECT p.*, pc.name AS category_name
+            FROM products p
+            JOIN product_categories pc ON p.category_id = pc.id
+            WHERE p.is_active = 1
+            ORDER BY p.id ASC
+            LIMIT 4
+        ");
+    }
+
     // 0. Live Hero Slides
     try {
         $heroSlides = Database::fetchAll("SELECT * FROM hero_slides WHERE is_active = 1 ORDER BY display_order ASC, id ASC");
@@ -85,7 +105,7 @@ try {
     error_log('Homepage Data Load Error: ' . $t->getMessage());
     $heroSlides = [];
     $totalCows = 0; $rescuedCows = 0; $activeSponsors = 0; $yearsOfSeva = 14;
-    $featuredCows = []; $breeds = []; $sevaPrograms = [];
+    $featuredCows = []; $breeds = []; $sevaPrograms = []; $featuredProducts = [];
     $totalDonations = 0; $totalExpenses = 0; $expenseCategories = [];
     $recentStories = []; $galleryItems = []; $testimonials = [];
 }
@@ -359,6 +379,77 @@ $resolveHeroImg = function(string $img): string {
 </section>
 
 <!-- ==============================================================================
+     2.5. SANCTUARY DARSHAN & VISITING TIMINGS BANNER
+     ============================================================================== -->
+<?php $homeTimings = get_goushala_timings(); ?>
+<section class="py-4 bg-cream border-top border-bottom border-warning border-opacity-25" data-animate="fade-up">
+    <div class="container">
+        <div class="card p-4 rounded-4 bg-forest-dark text-white border-0 shadow-md">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <span class="badge <?= $homeTimings['is_open'] ? 'bg-success' : 'bg-warning text-dark'; ?> rounded-pill px-3 py-1 fw-bold shadow-xs">
+                            <i class="bi bi-circle-fill me-1" style="font-size: 0.55rem;"></i> <?= e($homeTimings['status_text']); ?>
+                        </span>
+                        <span class="text-gold fw-semibold small"><i class="bi bi-geo-alt-fill me-1"></i> Nandi Hills Foothills, Bangalore</span>
+                    </div>
+                    <h3 class="h4 font-serif text-cream mb-2"><i class="bi bi-clock-history text-gold me-2"></i> Goushala Darshan & Visiting Timings</h3>
+                    <p class="small text-cream opacity-85 mb-0 lh-base">
+                        <?= e($homeTimings['note']); ?>
+                    </p>
+                </div>
+                <div class="col-lg-5">
+                    <div class="p-3 p-md-4 rounded-4 shadow-sm mb-3" style="background: linear-gradient(145deg, #18281e 0%, #0d1a13 100%); border: 1.5px solid rgba(255, 179, 0, 0.45); box-shadow: 0 8px 24px rgba(230, 81, 0, 0.18);">
+                        <div class="d-flex justify-content-between align-items-center pb-2 mb-2 border-bottom" style="border-color: rgba(255, 179, 0, 0.2) !important;">
+                            <span class="text-white small d-flex align-items-center">
+                                <span class="rounded-circle p-1 me-2 d-flex align-items-center justify-content-center" style="background: rgba(255, 107, 0, 0.2); width: 28px; height: 28px;">
+                                    <i class="bi bi-sun-fill" style="color: #ff9100;"></i>
+                                </span>
+                                <strong class="text-white">Morning Darshan:</strong>
+                            </span>
+                            <span class="badge font-monospace fw-bold fs-6 px-3 py-1 shadow-xs" style="background: linear-gradient(135deg, #ff7a00 0%, #e65100 100%); color: #ffffff; border: 1px solid #ffa726;">
+                                <?= e($homeTimings['morning']); ?>
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center pb-2 mb-2 border-bottom" style="border-color: rgba(255, 179, 0, 0.2) !important;">
+                            <span class="text-white small d-flex align-items-center">
+                                <span class="rounded-circle p-1 me-2 d-flex align-items-center justify-content-center" style="background: rgba(255, 179, 0, 0.2); width: 28px; height: 28px;">
+                                    <i class="bi bi-sunset-fill" style="color: #ffb300;"></i>
+                                </span>
+                                <strong class="text-white">Evening Darshan:</strong>
+                            </span>
+                            <span class="badge font-monospace fw-bold fs-6 px-3 py-1 shadow-xs" style="background: linear-gradient(135deg, #ffb300 0%, #f57f17 100%); color: #122016; border: 1px solid #ffd54f;">
+                                <?= e($homeTimings['evening']); ?>
+                            </span>
+                        </div>
+                        <div class="p-2 px-3 rounded-3 small mb-2 d-flex align-items-center gap-2" style="background: rgba(230, 81, 0, 0.15); border: 1px solid rgba(255, 179, 0, 0.4); color: #ffe082;">
+                            <i class="bi bi-bell-fill fs-6 flex-shrink-0" style="color: #ffb300;"></i>
+                            <span class="fw-semibold"><?= e($homeTimings['aarti']); ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center small pt-1">
+                            <span class="badge px-3 py-1 shadow-xs" style="background: #0f3d2a; color: #a3e635; border: 1px solid rgba(163, 230, 53, 0.4);">
+                                <i class="bi bi-calendar-check-fill me-1"></i> <?= e($homeTimings['days']); ?>
+                            </span>
+                            <span class="extra-small fw-semibold" style="color: #ffd54f;">
+                                <i class="bi bi-flower1 me-1"></i> Open for Families
+                            </span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                        <a href="<?= BASE_URL; ?>/contact.php" class="btn btn-gold btn-sm rounded-pill px-3 fw-bold shadow-gold">
+                            <i class="bi bi-compass me-1"></i> Plan a Darshan Visit
+                        </a>
+                        <a href="https://wa.me/<?= preg_replace('/\D/', '', get_primary_whatsapp_number()); ?>?text=<?= urlencode('Namaste Kamadenu Goushala! I would like to plan a visit for sacred cow darshan.'); ?>" target="_blank" rel="noopener" class="btn btn-success btn-sm rounded-pill px-3 fw-bold">
+                            <i class="bi bi-whatsapp me-1"></i> WhatsApp Inquiry
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==============================================================================
      3. MEET THE COWS (AJAX Filterable Showcase)
      ============================================================================== -->
 <section class="py-5 mt-4" id="meet-cows">
@@ -580,6 +671,119 @@ $resolveHeroImg = function(string $img): string {
         </div>
     </div>
 </section>
+
+<!-- ==============================================================================
+     6.5 SACRED ORGANIC PRODUCTS (Vedic A2 Ghee, Panchagavya & Direct WhatsApp Orders)
+     ============================================================================== -->
+<?php if (!empty($featuredProducts)): ?>
+<section class="py-5 bg-white border-top border-bottom position-relative overflow-hidden" id="store" data-animate="fade-up">
+    <div class="container py-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-3">
+            <div>
+                <span class="section-tag"><i class="bi bi-bag-heart-fill"></i> Vedic Sanctuary Store</span>
+                <h2 class="section-title">Pure Vedic Gau Products</h2>
+                <p class="section-subtitle mb-0">Handcrafted strictly according to classical Ayurvedic shastras. 100% of proceeds support fodder & care for our protected cows.</p>
+            </div>
+            <a href="<?= BASE_URL; ?>/products.php" class="btn btn-outline-forest">
+                Explore Full Store <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <?php foreach ($featuredProducts as $pidx => $p): 
+                $pImage = image_url($p['main_image'] ?? null, 'products', 'placeholder-product.jpg');
+                $inStock = ((int)$p['stock_quantity'] > 0);
+                $hasDiscount = (!empty($p['discount_price']) && $p['discount_price'] < $p['price']);
+                $effPrice = $hasDiscount ? (float)$p['discount_price'] : (float)$p['price'];
+                $formattedPrice = format_inr($effPrice);
+                
+                $prodWaNum = !empty($p['whatsapp_number']) ? $p['whatsapp_number'] : get_primary_whatsapp_number();
+                $cleanProdWaNum = preg_replace('/\D/', '', $prodWaNum);
+                $prodUrl = BASE_URL . '/product-details.php?slug=' . urlencode($p['slug']);
+                
+                if (!empty($p['whatsapp_message'])) {
+                    $waOrderText = $p['whatsapp_message'];
+                } else {
+                    $waOrderText = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                  "I would like to order:\n" .
+                                  "🌿 *Product:* " . $p['name'] . "\n" .
+                                  "📦 *Packaging:* " . $p['unit'] . "\n" .
+                                  "💰 *Price:* " . $formattedPrice . "\n" .
+                                  "🔗 *Store Link:* " . $prodUrl . "\n\n" .
+                                  "Please share payment instructions and home delivery schedule. 🙏";
+                }
+                $waDirectUrl = "https://wa.me/" . $cleanProdWaNum . "?text=" . rawurlencode($waOrderText);
+            ?>
+            <div class="col-md-6 col-lg-3" data-animate="fade-up" data-delay="<?= $pidx * 120 + 80; ?>">
+                <div class="heritage-card h-100 d-flex flex-column">
+                    <div class="position-relative overflow-hidden" style="height: 220px; background: #faf8f5;">
+                        <img 
+                            src="<?= e($pImage); ?>" 
+                            alt="<?= e($p['name']); ?>" 
+                            class="w-100 h-100 object-fit-cover transition-all"
+                            loading="lazy"
+                            onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/placeholder-product.jpg';"
+                        >
+                        <?php if ($hasDiscount): ?>
+                            <span class="position-absolute top-0 start-0 m-2 badge bg-danger small">
+                                Save <?= format_inr($p['price'] - $p['discount_price']); ?>
+                            </span>
+                        <?php endif; ?>
+                        <span class="position-absolute bottom-0 start-0 m-2 badge bg-black bg-opacity-75 text-white small">
+                            <?= e($p['unit']); ?>
+                        </span>
+                    </div>
+
+                    <div class="heritage-card-inner d-flex flex-column flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge bg-gold-subtle text-gold-dark extra-small"><?= e($p['category_name']); ?></span>
+                            <?php if ($inStock): ?>
+                                <span class="text-success extra-small fw-semibold"><i class="bi bi-check-circle-fill me-1"></i>In Stock</span>
+                            <?php else: ?>
+                                <span class="text-muted extra-small"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+                            <?php endif; ?>
+                        </div>
+
+                        <h3 class="h6 font-serif text-forest-dark mb-2">
+                            <a href="<?= BASE_URL; ?>/product-details.php?slug=<?= e($p['slug']); ?>" class="text-forest-dark text-decoration-none">
+                                <?= e($p['name']); ?>
+                            </a>
+                        </h3>
+
+                        <div class="d-flex align-items-baseline gap-2 mb-3">
+                            <span class="fs-5 font-serif text-forest-dark fw-bold"><?= $formattedPrice; ?></span>
+                            <?php if ($hasDiscount): ?>
+                                <span class="small text-decoration-line-through text-muted"><?= format_inr($p['price']); ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-auto pt-2 border-top">
+                            <?php if ($inStock): ?>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-gold btn-sm rounded-pill flex-grow-1 fw-bold btn-buy-now shadow-xs" data-product-id="<?= $p['id']; ?>" title="Buy Now & Proceed to Checkout">
+                                        <i class="bi bi-bag-check-fill me-1"></i> Buy Now
+                                    </button>
+                                    <button type="button" class="btn btn-outline-forest btn-sm rounded-pill px-3 btn-add-to-cart" data-product-id="<?= $p['id']; ?>" title="Add to Shopping Cart">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </div>
+                                <a href="<?= e($waDirectUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm rounded-pill w-100 fw-semibold shadow-xs" title="Order directly on WhatsApp from <?= e($prodWaNum); ?>">
+                                    <i class="bi bi-whatsapp me-1"></i> Order via WhatsApp
+                                </a>
+                            <?php else: ?>
+                                <button type="button" class="btn btn-secondary btn-sm rounded-pill w-100" disabled>
+                                    <i class="bi bi-slash-circle me-1"></i> Out of Stock
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 <!-- ==============================================================================
      7. TRANSPARENCY & ACCOUNTABILITY (Charts & Real MySQL Data)
@@ -812,6 +1016,93 @@ $resolveHeroImg = function(string $img): string {
 
 <!-- Include Cows AJAX script for filtering -->
 <script src="<?= ASSETS_URL; ?>/js/cows.js"></script>
+
+<!-- Add To Cart & Buy Now Client Handler Script -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Add To Cart Handler
+    document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const prodId = this.getAttribute('data-product-id');
+            const origHtml = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+            this.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'add');
+                formData.append('product_id', prodId);
+                formData.append('quantity', '1');
+                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+
+                const res = await fetch('<?= BASE_URL; ?>/ajax/products.php', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast(data.message || 'Product added to cart!', 'success');
+                    const badges = document.querySelectorAll('.cart-count-badge');
+                    badges.forEach(b => {
+                        b.textContent = data.cart_count;
+                        b.classList.remove('d-none');
+                    });
+                } else {
+                    showToast(data.message || 'Could not add to cart.', 'danger');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to connect to cart service.', 'danger');
+            } finally {
+                this.innerHTML = origHtml;
+                this.disabled = false;
+            }
+        });
+    });
+
+    // Buy Now Handler
+    document.querySelectorAll('.btn-buy-now').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const prodId = this.getAttribute('data-product-id');
+            const origHtml = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+            this.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'add');
+                formData.append('product_id', prodId);
+                formData.append('quantity', '1');
+                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+
+                const res = await fetch('<?= BASE_URL; ?>/ajax/products.php', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    window.location.href = '<?= BASE_URL; ?>/checkout.php';
+                } else {
+                    showToast(data.message || 'Could not process checkout.', 'danger');
+                    this.innerHTML = origHtml;
+                    this.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to initiate checkout.', 'danger');
+                this.innerHTML = origHtml;
+                this.disabled = false;
+            }
+        });
+    });
+});
+</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
 

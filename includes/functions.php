@@ -263,3 +263,101 @@ function log_activity(?int $userId, string $action, ?string $entityType = null, 
         error_log('Failed to log activity: ' . $t->getMessage());
     }
 }
+
+/**
+ * Retrieve list of configured WhatsApp department lines from settings.
+ * Returns array of [ ['id' => ..., 'label' => ..., 'phone' => ..., 'is_default' => 0|1] ]
+ */
+function get_whatsapp_numbers(): array {
+    $raw = get_setting('whatsapp_numbers_list', '');
+    if (!empty($raw)) {
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded) && !empty($decoded)) {
+            return $decoded;
+        }
+    }
+    $primary = get_setting('site_whatsapp', get_setting('whatsapp_number', '+91 98450 12345'));
+    return [
+        ['id' => 'wa_1', 'label' => 'Primary Seva Helpline', 'phone' => $primary, 'is_default' => 1],
+        ['id' => 'wa_2', 'label' => 'Organic Store & Orders Desk', 'phone' => '+91 98450 67890', 'is_default' => 0],
+        ['id' => 'wa_3', 'label' => 'Cow Adoption & Sponsorships', 'phone' => '+91 98450 11223', 'is_default' => 0],
+    ];
+}
+
+/**
+ * Retrieve the active primary WhatsApp number for the platform.
+ */
+function get_primary_whatsapp_number(): string {
+    $numbers = get_whatsapp_numbers();
+    foreach ($numbers as $num) {
+        if (!empty($num['is_default']) && !empty($num['phone'])) {
+            return $num['phone'];
+        }
+    }
+    return !empty($numbers[0]['phone']) ? $numbers[0]['phone'] : get_setting('site_whatsapp', '+91 98450 12345');
+}
+
+/**
+ * Retrieve configured Goushala visiting and opening/closing hours.
+ */
+function get_goushala_timings(): array {
+    $morning = get_setting('visiting_hours_morning', '06:30 AM - 12:30 PM');
+    $evening = get_setting('visiting_hours_evening', '04:00 PM - 07:30 PM');
+    $days = get_setting('visiting_days', 'Open All 7 Days • Monday to Sunday');
+    $aarti = get_setting('aarti_timings', 'Morning Gomata Aarti: 06:30 AM | Sandhya Deepa Aarti: 06:45 PM');
+    $note = get_setting('goushala_timings_note', 'Devotees and families are warmly welcome for sacred Gomata Darshan, fresh grass feeding, and sanctuary parikrama.');
+    $override = get_setting('visiting_status_override', 'auto');
+
+    // Calculate current live status based on local time
+    $isOpen = true;
+    if ($override === 'closed') {
+        $isOpen = false;
+        $statusText = 'Closed for the Day';
+    } elseif ($override === 'open') {
+        $isOpen = true;
+        $statusText = 'Open for Darshan Now';
+    } elseif ($override === 'festival_special') {
+        $isOpen = true;
+        $statusText = 'Festival Special Darshan Open';
+    } else {
+        // Auto calculation: check slots (06:30 to 12:30 & 16:00 to 19:30)
+        $nowH = (int)date('H');
+        $nowM = (int)date('i');
+        $nowMinutes = ($nowH * 60) + $nowM;
+        
+        $mStart = (6 * 60) + 30; // 06:30 AM
+        $mEnd = (12 * 60) + 30;  // 12:30 PM
+        $eStart = (16 * 60) + 0; // 04:00 PM
+        $eEnd = (19 * 60) + 30;  // 07:30 PM
+
+        $isMorning = ($nowMinutes >= $mStart && $nowMinutes <= $mEnd);
+        $isEvening = ($nowMinutes >= $eStart && $nowMinutes <= $eEnd);
+        $isOpen = ($isMorning || $isEvening);
+
+        if ($isOpen) {
+            $statusText = $isMorning ? 'Open Now (Morning Slot)' : 'Open Now (Evening Slot)';
+        } else {
+            if ($nowMinutes < $mStart) {
+                $statusText = 'Opens at 06:30 AM';
+            } elseif ($nowMinutes > $mEnd && $nowMinutes < $eStart) {
+                $statusText = 'Afternoon Rest (Opens 04:00 PM)';
+            } else {
+                $statusText = 'Closed for Night (Opens 06:30 AM)';
+            }
+        }
+    }
+
+    return [
+        'morning' => $morning,
+        'evening' => $evening,
+        'days'    => $days,
+        'aarti'   => $aarti,
+        'note'    => $note,
+        'override'=> $override,
+        'is_open' => $isOpen,
+        'status_text' => $statusText,
+        'full_display' => "{$morning} & {$evening}"
+    ];
+}
+
+

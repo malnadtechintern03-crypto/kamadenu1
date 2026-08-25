@@ -142,20 +142,65 @@ $cart = Order::getCart();
                             </p>
 
                             <div class="pt-3 border-top mt-auto">
-                                <div class="d-flex align-items-baseline gap-2 mb-3">
-                                    <span class="fs-5 font-serif text-forest-dark fw-bold"><?= format_inr($effectivePrice); ?></span>
-                                    <?php if ($hasDiscount): ?>
-                                        <span class="text-decoration-line-through text-muted small"><?= format_inr($p['price']); ?></span>
+                                <div class="d-flex align-items-baseline justify-content-between mb-3">
+                                    <div class="d-flex align-items-baseline gap-2">
+                                        <span class="fs-5 font-serif text-forest-dark fw-bold"><?= format_inr($effectivePrice); ?></span>
+                                        <?php if ($hasDiscount): ?>
+                                            <span class="text-decoration-line-through text-muted small"><?= format_inr($p['price']); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php if ((int)$p['stock_quantity'] > 0): ?>
+                                        <span class="badge bg-success-subtle text-success small border border-success border-opacity-25"><i class="bi bi-check2 me-1"></i>In Stock</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary-subtle text-muted small"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
                                     <?php endif; ?>
                                 </div>
 
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-gold btn-sm rounded-pill flex-grow-1 btn-add-to-cart" data-product-id="<?= $p['id']; ?>">
-                                        <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                                    </button>
-                                    <a href="<?= BASE_URL; ?>/product-details.php?slug=<?= e($p['slug']); ?>" class="btn btn-outline-forest btn-sm rounded-pill px-3" title="View Product Details">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
+                                <div class="d-grid gap-2">
+                                    <?php if ((int)$p['stock_quantity'] > 0): ?>
+                                        <div class="d-flex gap-2">
+                                            <!-- Direct Buy Now Option -->
+                                            <button type="button" class="btn btn-gold btn-sm rounded-pill flex-grow-1 fw-bold btn-buy-now shadow-xs" data-product-id="<?= $p['id']; ?>" title="Buy Now & Proceed to Checkout">
+                                                <i class="bi bi-bag-check-fill me-1"></i> Buy Now
+                                            </button>
+                                            <!-- Add to Cart Option -->
+                                            <button type="button" class="btn btn-outline-forest btn-sm rounded-pill px-3 btn-add-to-cart" data-product-id="<?= $p['id']; ?>" title="Add to Shopping Cart">
+                                                <i class="bi bi-cart-plus"></i>
+                                            </button>
+                                            <!-- View Details -->
+                                            <a href="<?= BASE_URL; ?>/product-details.php?slug=<?= e($p['slug']); ?>" class="btn btn-outline-secondary btn-sm rounded-pill px-2" title="View Product Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </div>
+
+                                        <!-- Order via WhatsApp with Admin Preset Message & Assigned Desk -->
+                                        <?php
+                                            $prodWaNum = !empty($p['whatsapp_number']) ? $p['whatsapp_number'] : get_primary_whatsapp_number();
+                                            $cleanProdWaNum = preg_replace('/\D/', '', $prodWaNum);
+                                            $prodPriceFormatted = format_inr((float)($p['discount_price'] ?: $p['price']));
+                                            $prodUrl = BASE_URL . '/product-details.php?slug=' . urlencode($p['slug']);
+                                            
+                                            if (!empty($p['whatsapp_message'])) {
+                                                $waOrderText = $p['whatsapp_message'];
+                                            } else {
+                                                $waOrderText = "🙏 *Namaste Kamadenu Goushala!*\n\n" .
+                                                              "I would like to order:\n" .
+                                                              "🌿 *Product:* " . $p['name'] . "\n" .
+                                                              "📦 *Packaging:* " . $p['unit'] . "\n" .
+                                                              "💰 *Price:* " . $prodPriceFormatted . "\n" .
+                                                              "🔗 *Store Link:* " . $prodUrl . "\n\n" .
+                                                              "Please share payment instructions and home delivery schedule. 🙏";
+                                            }
+                                            $waDirectUrl = "https://wa.me/" . $cleanProdWaNum . "?text=" . rawurlencode($waOrderText);
+                                        ?>
+                                        <a href="<?= e($waDirectUrl); ?>" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm rounded-pill w-100 fw-semibold shadow-xs" title="Order directly on WhatsApp from <?= e($prodWaNum); ?>">
+                                            <i class="bi bi-whatsapp me-1"></i> Order via WhatsApp
+                                        </a>
+                                    <?php else: ?>
+                                        <button type="button" class="btn btn-secondary btn-sm rounded-pill w-100" disabled>
+                                            <i class="bi bi-slash-circle me-1"></i> Out of Stock
+                                        </button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -200,15 +245,16 @@ $cart = Order::getCart();
     </div>
 </section>
 
-<!-- Add To Cart Client Handler Script -->
+<!-- Add To Cart & Buy Now Client Handler Script -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Add To Cart Handler
     document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
         btn.addEventListener('click', async function(e) {
             e.preventDefault();
             const productId = this.getAttribute('data-product-id');
             const originalHtml = this.innerHTML;
-            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Adding...';
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
             this.disabled = true;
 
             try {
@@ -238,6 +284,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error(err);
                 showToast('Failed to connect to cart service.', 'danger');
             } finally {
+                this.innerHTML = originalHtml;
+                this.disabled = false;
+            }
+        });
+    });
+
+    // Buy Now Handler (Adds to cart and redirects immediately to checkout)
+    document.querySelectorAll('.btn-buy-now').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const productId = this.getAttribute('data-product-id');
+            const originalHtml = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Buying...';
+            this.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'add');
+                formData.append('product_id', productId);
+                formData.append('quantity', '1');
+                formData.append('csrf_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+                const res = await fetch('<?= BASE_URL; ?>/ajax/products.php', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    window.location.href = '<?= BASE_URL; ?>/checkout.php';
+                } else {
+                    showToast(data.message || 'Could not process buy request.', 'danger');
+                    this.innerHTML = originalHtml;
+                    this.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to connect to checkout service.', 'danger');
                 this.innerHTML = originalHtml;
                 this.disabled = false;
             }
