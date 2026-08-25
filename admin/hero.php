@@ -644,12 +644,13 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Or Select Preset Sanctuary Asset</label>
                             <select name="preset_image" class="form-select">
-                                <option value="">-- Or Choose Built-in Photo --</option>
-                                <option value="assets/images/hero-cow.jpg">Default Sacred Cow (hero-cow.jpg)</option>
-                                <option value="assets/images/breeds/gir.jpg">Gir Breed Sanctuary (breeds/gir.jpg)</option>
-                                <option value="assets/images/breeds/sahiwal.jpg">Sahiwal Indigenous Cow (breeds/sahiwal.jpg)</option>
-                                <option value="assets/images/breeds/hallikar.jpg">Hallikar Heritage Draught (breeds/hallikar.jpg)</option>
-                                <option value="assets/images/breeds/tharparkar.jpg">Tharparkar Divine Cow (breeds/tharparkar.jpg)</option>
+                                <option value="">-- Or Choose Built-in High-Res Photo --</option>
+                                <option value="uploads/gallery/a1b0ada5f7687dc187096710a669dad6.jpg">Sacred Pasture Gir Cows (16:9 Widescreen)</option>
+                                <option value="uploads/gallery/9b5788b66ff99365c739a5b231fc5157.jpg">Vedic Gau Aarti Ceremony (Temple Arch)</option>
+                                <option value="uploads/gallery/b8df51dfa70d1913f34386f558c14e2b.jpg">Gau Seva Grāsa Feeding (Nutritious Grass)</option>
+                                <option value="uploads/gallery/25ffe47ef7836666a5e0ef830453ab81.jpg">Gopashtami Mahotsav Celebration</option>
+                                <option value="assets/images/about-goushala.jpg">Organic Pasture Meadow (about-goushala.jpg)</option>
+                                <option value="assets/images/hero-cow.jpg">Sacred Gir Cow (hero-cow.jpg)</option>
                             </select>
                         </div>
                     </div>

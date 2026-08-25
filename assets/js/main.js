@@ -213,16 +213,19 @@ function initRippleEffects() {
  * Subtle Scroll Parallax for Hero Background
  */
 function initHeroParallax() {
-  const heroImage = document.querySelector('.hero-bg-image');
-  if (!heroImage) return;
+  const heroContainers = document.querySelectorAll('.hero-image');
+  if (heroContainers.length === 0) return;
 
   let ticking = false;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       window.requestAnimationFrame(() => {
         const scrolled = window.pageYOffset;
-        if (scrolled < 800) {
-          heroImage.style.transform = `translateY(${scrolled * 0.15}px)`;
+        if (scrolled < 900) {
+          const offset = (scrolled * 0.12).toFixed(1);
+          heroContainers.forEach(container => {
+            container.style.transform = `translate3d(0, ${offset}px, 0)`;
+          });
         }
         ticking = false;
       });

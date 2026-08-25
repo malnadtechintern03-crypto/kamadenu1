@@ -130,13 +130,13 @@ $resolveHeroImg = function(string $img): string {
      1. DYNAMIC FULL-SCREEN HERO SECTION / SLIDER (Admin Managed)
      ============================================================================== -->
 <?php if (count($heroSlides) > 1): ?>
-    <section class="hero-section hero-slider-section position-relative p-0 overflow-hidden">
+    <section class="hero-section hero-slider-section position-relative p-0 overflow-hidden w-100">
         <!-- Grand Golden Particle Sparks Layer -->
         <canvas id="heroParticlesCanvas" class="hero-particles-layer"></canvas>
         <div class="hero-ambient-orb hero-ambient-orb-1"></div>
         <div class="hero-ambient-orb hero-ambient-orb-2"></div>
 
-        <div id="homepageHeroCarousel" class="carousel slide carousel-fade h-100" data-bs-ride="carousel" data-bs-interval="6000" data-bs-pause="hover">
+        <div id="homepageHeroCarousel" class="carousel slide carousel-fade w-100 h-100" data-bs-ride="carousel" data-bs-interval="6000" data-bs-pause="hover">
             <!-- Carousel Slide Progress Countdown Bar -->
             <div class="carousel-slide-progress">
                 <div class="carousel-progress-fill" id="heroCarouselProgress"></div>
@@ -156,15 +156,15 @@ $resolveHeroImg = function(string $img): string {
             </div>
 
             <!-- Carousel Slides -->
-            <div class="carousel-inner h-100">
+            <div class="carousel-inner w-100 h-100">
                 <?php foreach ($heroSlides as $idx => $slide): 
                     $slideBg = $resolveHeroImg($slide['image_path'] ?? '');
                 ?>
-                    <div class="carousel-item <?= $idx === 0 ? 'active' : ''; ?> position-relative">
-                        <div class="hero-image">
-                            <img src="<?= e($slideBg); ?>" alt="<?= e($slide['title']); ?>" class="hero-bg-image" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/hero-cow.jpg';">
+                    <div class="carousel-item w-100 h-100 <?= $idx === 0 ? 'active' : ''; ?> position-relative">
+                        <div class="hero-image position-absolute top-0 start-0 w-100 h-100">
+                            <img src="<?= e($slideBg); ?>" alt="<?= e($slide['title']); ?>" class="hero-bg-image w-100 h-100" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/about-goushala.jpg';">
                         </div>
-                        <div class="hero-overlay"></div>
+                        <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
                         <div class="container hero-content">
                             <?php if (!empty($slide['badge_text'])): ?>
                                 <div class="mb-2">
@@ -175,6 +175,7 @@ $resolveHeroImg = function(string $img): string {
                             <?php endif; ?>
 
                             <span class="hero-eyebrow">
+                                <i class="bi bi-flower1 me-1 text-gold"></i>
                                 <?= e($slide['eyebrow'] ?: 'KAMADENU GOUSHALA'); ?>
                             </span>
 
@@ -230,14 +231,14 @@ $resolveHeroImg = function(string $img): string {
     $singleSlide = $heroSlides[0];
     $singleBg = $resolveHeroImg($singleSlide['image_path'] ?? '');
 ?>
-    <section class="hero-section position-relative overflow-hidden">
+    <section class="hero-section position-relative overflow-hidden w-100">
         <canvas id="heroParticlesCanvas" class="hero-particles-layer"></canvas>
         <div class="hero-ambient-orb hero-ambient-orb-1"></div>
         <div class="hero-ambient-orb hero-ambient-orb-2"></div>
-        <div class="hero-image">
-            <img src="<?= e($singleBg); ?>" alt="<?= e($singleSlide['title']); ?>" class="hero-bg-image" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/hero-cow.jpg';">
+        <div class="hero-image position-absolute top-0 start-0 w-100 h-100">
+            <img src="<?= e($singleBg); ?>" alt="<?= e($singleSlide['title']); ?>" class="hero-bg-image w-100 h-100" onerror="this.onerror=null;this.src='<?= BASE_URL; ?>/assets/images/about-goushala.jpg';">
         </div>
-        <div class="hero-overlay"></div>
+        <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
         <div class="container hero-content position-relative" style="z-index: 4;">
             <?php if (!empty($singleSlide['badge_text'])): ?>
                 <div class="mb-2">
@@ -248,6 +249,7 @@ $resolveHeroImg = function(string $img): string {
             <?php endif; ?>
 
             <span class="hero-eyebrow">
+                <i class="bi bi-flower1 me-1 text-gold"></i>
                 <?= e($singleSlide['eyebrow'] ?: 'KAMADENU GOUSHALA'); ?>
             </span>
 
@@ -286,17 +288,17 @@ $resolveHeroImg = function(string $img): string {
 
 <?php else: ?>
     <!-- Static Fallback Hero Section -->
-    <section class="hero-section position-relative overflow-hidden">
+    <section class="hero-section position-relative overflow-hidden w-100">
         <canvas id="heroParticlesCanvas" class="hero-particles-layer"></canvas>
         <div class="hero-ambient-orb hero-ambient-orb-1"></div>
         <div class="hero-ambient-orb hero-ambient-orb-2"></div>
-        <div class="hero-image">
-            <img src="<?= BASE_URL; ?>/assets/images/hero-cow.jpg" alt="Rescued cow at Kamadenu Goushala" class="hero-bg-image">
+        <div class="hero-image position-absolute top-0 start-0 w-100 h-100">
+            <img src="<?= BASE_URL; ?>/assets/images/about-goushala.jpg" alt="Rescued cows grazing at Kamadenu Goushala pasture" class="hero-bg-image w-100 h-100">
         </div>
-        <div class="hero-overlay"></div>
+        <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
         <div class="container hero-content position-relative" style="z-index: 4;">
-            <span class="hero-eyebrow">KAMADENU GOUSHALA</span>
-            <h1>Every Life Deserves Care.</h1>
+            <span class="hero-eyebrow"><i class="bi bi-flower1 me-1 text-gold"></i> KAMADENU GOUSHALA</span>
+            <h1>Every Life Deserves Care &amp; Dignity.</h1>
             <p class="fs-5 mb-4 text-light text-opacity-90">Protecting, healing and nurturing rescued cows with compassion, seva and dignity.</p>
             <div class="hero-buttons">
                 <a href="<?= BASE_URL; ?>/donate.php" class="btn btn-gold shadow-gold">
