@@ -85,14 +85,41 @@ $siteName = get_setting('site_name', 'Kamadenu Goushala');
         <a href="<?= BASE_URL; ?>/admin/expenses.php" class="admin-nav-link <?= $isActive('expenses.php') ? 'active' : ''; ?>" title="Verified Expenses">
             <i class="bi bi-receipt"></i> <span>Verified Expenses</span>
         </a>
-        <a href="<?= BASE_URL; ?>/admin/messages.php" class="admin-nav-link <?= $isActive('messages.php') ? 'active' : ''; ?>" title="Devotee Messages">
-            <i class="bi bi-envelope"></i> <span>Devotee Messages</span>
+        <?php
+        $sidebarUnreadCount = 0;
+        try {
+            $sidebarUnreadCount = (int)Database::fetchColumn("SELECT COUNT(*) FROM contact_messages WHERE is_read = 0");
+        } catch (Throwable $e) {}
+        ?>
+        <a href="<?= BASE_URL; ?>/admin/messages.php" class="admin-nav-link d-flex align-items-center justify-content-between <?= $isActive('messages.php') ? 'active' : ''; ?>" title="Devotee Messages & Darshan Requests">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-envelope"></i> <span>Devotee Messages</span>
+            </div>
+            <?php if ($sidebarUnreadCount > 0): ?>
+                <span class="badge bg-danger rounded-pill px-2 py-0 extra-small"><?= $sidebarUnreadCount; ?></span>
+            <?php endif; ?>
         </a>
 
         <div class="px-4 pt-3 pb-1 small text-uppercase tracking-wider text-muted extra-small fw-bold sidebar-section-title">Administration</div>
         <a href="<?= BASE_URL; ?>/admin/settings.php" class="admin-nav-link <?= $isActive('settings.php') ? 'active' : ''; ?>" title="Sanctuary Settings">
             <i class="bi bi-sliders"></i> <span>Sanctuary Settings</span>
         </a>
+    </div>
+
+    <!-- Quick Contact Touchpoint in Sidebar -->
+    <?php
+    $sbPhone = get_setting('site_phone', '+91 98450 12345');
+    $sbWa = get_setting('site_whatsapp', '+91 63635 56712');
+    $sbEmail = get_setting('site_email', 'seva@kamadenugoushala.org');
+    ?>
+    <div class="p-3 mx-2 my-2 rounded-3 bg-forest-dark border border-warning border-opacity-20 admin-sidebar-footer-text" style="font-size: 0.78rem;">
+        <div class="d-flex justify-content-between align-items-center mb-1 text-gold fw-bold">
+            <span><i class="bi bi-telephone-inbound-fill me-1"></i> Contact Desk</span>
+            <a href="<?= BASE_URL; ?>/admin/settings.php" class="text-white-50 hover-gold" title="Edit Contact Info"><i class="bi bi-pencil-square"></i></a>
+        </div>
+        <div class="text-white opacity-90 text-truncate"><i class="bi bi-telephone text-gold me-1"></i> <?= e($sbPhone); ?></div>
+        <div class="text-white opacity-90 text-truncate"><i class="bi bi-whatsapp text-success me-1"></i> <?= e($sbWa); ?></div>
+        <div class="text-white opacity-75 text-truncate" title="<?= e($sbEmail); ?>"><i class="bi bi-envelope text-gold me-1"></i> <?= e($sbEmail); ?></div>
     </div>
 
     <!-- Sign Out Footer Link -->

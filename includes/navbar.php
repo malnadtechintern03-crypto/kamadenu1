@@ -1,6 +1,6 @@
 <?php
 /**
- * Kamadenu Goushala Platform - Responsive Navigation Bar (Single Row Horizontal Flow)
+ * Kamadenu Goushala Platform - Responsive Navigation Bar with Contact Topbar
  */
 
 declare(strict_types=1);
@@ -14,6 +14,7 @@ $isSeva     = str_contains($currentUri, 'seva') || str_contains($currentUri, 'fe
 $isProducts = str_contains($currentUri, 'products.php') || str_contains($currentUri, 'product-details.php') || str_contains($currentUri, 'cart.php') || str_contains($currentUri, 'checkout.php');
 $isGallery  = str_contains($currentUri, 'gallery.php') || str_contains($currentUri, 'videos.php');
 $isBlog     = str_contains($currentUri, 'blog.php') || str_contains($currentUri, 'blog-details.php');
+$isContact  = str_contains($currentUri, 'contact.php');
 $isDonate   = str_contains($currentUri, 'donate.php');
 ?>
 <!-- Main Sticky Navigation -->
@@ -32,9 +33,9 @@ $isDonate   = str_contains($currentUri, 'donate.php');
             </a>
         </div>
 
-        <!-- Horizontally Scrollable Navigation Links (Single Row beside Logo) -->
-        <div class="mobile-nav-scroll flex-grow-1 ms-2 ms-md-3 ms-lg-4" id="mainNavbarNav">
-            <ul class="navbar-nav d-flex flex-row align-items-center flex-nowrap ms-auto gap-1 gap-md-2">
+        <!-- Horizontally Scrollable Navigation Links (Middle) -->
+        <div class="mobile-nav-scroll flex-grow-1 mx-2 mx-md-3" id="mainNavbarNav">
+            <ul class="navbar-nav d-flex flex-row align-items-center flex-nowrap ms-auto gap-1 gap-md-2 mb-0">
                 <li class="nav-item flex-shrink-0">
                     <a class="nav-link nav-link-custom <?= $isHome ? 'active' : ''; ?>" href="<?= BASE_URL; ?>/index.php">Home</a>
                 </li>
@@ -71,14 +72,17 @@ $isDonate   = str_contains($currentUri, 'donate.php');
                 <li class="nav-item flex-shrink-0">
                     <a class="nav-link nav-link-custom <?= $isBlog ? 'active' : ''; ?>" href="<?= BASE_URL; ?>/blog.php">Stories</a>
                 </li>
-
-                <!-- Primary CTA -->
-                <li class="nav-item flex-shrink-0 ms-1 ms-lg-2">
-                    <a href="<?= BASE_URL; ?>/donate.php" class="btn btn-gold px-3 px-lg-4 shadow-sm text-nowrap">
-                        <i class="bi bi-heart-fill"></i> Donate
-                    </a>
+                <li class="nav-item flex-shrink-0">
+                    <a class="nav-link nav-link-custom <?= $isContact ? 'active' : ''; ?>" href="<?= BASE_URL; ?>/contact.php">Contact</a>
                 </li>
             </ul>
+        </div>
+
+        <!-- Fixed Donate CTA Button on Far Right (Always Visible & Prominently Displayed) -->
+        <div class="navbar-cta-wrapper flex-shrink-0">
+            <a href="<?= BASE_URL; ?>/donate.php" class="btn btn-gold navbar-donate-btn <?= $isDonate ? 'btn-donate-active' : ''; ?> px-3 px-md-4 py-2 rounded-pill shadow-gold d-inline-flex align-items-center gap-2 text-nowrap" title="Support Sacred Gau Seva">
+                <i class="bi bi-heart-fill"></i> <span class="fw-bold">Donate</span>
+            </a>
         </div>
     </div>
 </nav>

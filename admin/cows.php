@@ -199,23 +199,23 @@ require_once __DIR__ . '/includes/header.php';
                         </td>
                         <td class="small text-muted"><?= format_date($c['rescue_date']); ?></td>
                         <td class="text-end">
-                            <div class="btn-group btn-group-sm">
+                            <div class="d-flex align-items-center justify-content-end gap-1">
                                 <!-- WhatsApp Share & Message Editor Button -->
-                                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#whatsappCowModal<?= $c['id']; ?>" title="Share on WhatsApp with Custom Message">
+                                <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-2 py-1" data-bs-toggle="modal" data-bs-target="#whatsappCowModal<?= $c['id']; ?>" title="Share on WhatsApp with Custom Message">
                                     <i class="bi bi-whatsapp"></i>
                                 </button>
-                                <a href="<?= BASE_URL; ?>/cow-details.php?slug=<?= e($c['slug']); ?>" target="_blank" class="btn btn-outline-secondary" title="View Public Profile">
+                                <a href="<?= BASE_URL; ?>/cow-details.php?slug=<?= e($c['slug']); ?>" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-2 py-1" title="View Public Profile">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="<?= BASE_URL; ?>/admin/cow-edit.php?id=<?= $c['id']; ?>" class="btn btn-outline-forest" title="Edit Cow">
-                                    <i class="bi bi-pencil"></i>
+                                <a href="<?= BASE_URL; ?>/admin/cow-edit.php?id=<?= $c['id']; ?>" class="btn btn-forest btn-sm rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 shadow-xs fw-semibold" title="Edit Cow Profile">
+                                    <i class="bi bi-pencil-square"></i> <span>Edit</span>
                                 </a>
                                 <?php if (has_role(['super_admin', 'admin', 'manager'])): ?>
                                 <form method="POST" action="<?= BASE_URL; ?>/admin/cows.php" onsubmit="return confirm('Are you sure you want to permanently delete cow record \'<?= e(addslashes($c['name'])); ?>\' (<?= e($c['cow_code']); ?>)? This action cannot be undone.');" class="d-inline">
                                     <?= csrf_field(); ?>
                                     <input type="hidden" name="action" value="delete_cow">
                                     <input type="hidden" name="id" value="<?= $c['id']; ?>">
-                                    <button type="submit" class="btn btn-outline-danger" title="Delete Cow">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-2 py-1" title="Delete Cow">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>

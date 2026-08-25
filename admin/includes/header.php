@@ -369,7 +369,73 @@ $pageTitle = $pageTitle ?? 'Admin Dashboard';
                 <h1 class="h5 font-serif text-forest-dark mb-0"><?= e($pageTitle); ?></h1>
             </div>
 
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2 gap-sm-3">
+                <?php
+                $adminSitePhone    = get_setting('site_phone', '+91 98450 12345');
+                $adminSiteEmail    = get_setting('site_email', 'seva@kamadenugoushala.org');
+                $adminSiteWhatsapp = get_setting('site_whatsapp', '+91 63635 56712');
+                $adminSiteAddress  = get_setting('site_address', 'Survey No. 42, Vedic Green Sanctuary Road, Near Nandi Hills Foothills, Bangalore Rural, Karnataka - 562103');
+                $adminUnreadMsgCount = 0;
+                try {
+                    $adminUnreadMsgCount = (int)Database::fetchColumn("SELECT COUNT(*) FROM contact_messages WHERE is_read = 0");
+                } catch (Throwable $e) {}
+                ?>
+
+                <!-- Sanctuary Contact Details Dropdown Widget -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-forest btn-sm rounded-pill dropdown-toggle d-inline-flex align-items-center gap-1 px-3 shadow-xs" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Sanctuary Contact & Helpline Details">
+                        <i class="bi bi-telephone-outbound text-gold"></i>
+                        <span class="d-none d-md-inline fw-semibold">Contact Details</span>
+                        <?php if ($adminUnreadMsgCount > 0): ?>
+                            <span class="badge bg-danger rounded-pill px-2 py-0 ms-1" style="font-size: 0.7rem;"><?= $adminUnreadMsgCount; ?></span>
+                        <?php endif; ?>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-3" style="min-width: 320px; max-width: 360px;">
+                        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                            <h6 class="font-serif text-forest-dark mb-0"><i class="bi bi-headset text-gold me-2"></i>Sanctuary Contact Desk</h6>
+                            <a href="<?= BASE_URL; ?>/admin/settings.php" class="small text-forest fw-semibold text-decoration-none">Edit <i class="bi bi-pencil-square"></i></a>
+                        </div>
+                        <div class="small mb-3">
+                            <div class="d-flex align-items-start gap-2 py-1">
+                                <i class="bi bi-telephone-fill text-gold mt-1"></i>
+                                <div>
+                                    <div class="text-muted extra-small">Primary Helpline:</div>
+                                    <a href="tel:<?= preg_replace('/\s+/', '', $adminSitePhone); ?>" class="fw-bold text-forest-dark text-decoration-none hover-forest"><?= e($adminSitePhone); ?></a>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-2 py-1">
+                                <i class="bi bi-whatsapp text-success mt-1"></i>
+                                <div>
+                                    <div class="text-muted extra-small">WhatsApp Seva:</div>
+                                    <a href="https://wa.me/<?= preg_replace('/\D/', '', $adminSiteWhatsapp); ?>" target="_blank" rel="noopener" class="fw-bold text-forest-dark text-decoration-none hover-forest"><?= e($adminSiteWhatsapp); ?></a>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-2 py-1">
+                                <i class="bi bi-envelope-fill text-gold mt-1"></i>
+                                <div>
+                                    <div class="text-muted extra-small">Official Email:</div>
+                                    <a href="mailto:<?= e($adminSiteEmail); ?>" class="fw-bold text-forest-dark text-decoration-none hover-forest"><?= e($adminSiteEmail); ?></a>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-2 py-1">
+                                <i class="bi bi-geo-alt-fill text-danger mt-1"></i>
+                                <div>
+                                    <div class="text-muted extra-small">Sanctuary Address:</div>
+                                    <div class="text-muted" style="font-size: 0.8rem; line-height: 1.35;"><?= e($adminSiteAddress); ?></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-top d-flex gap-2">
+                            <a href="<?= BASE_URL; ?>/admin/messages.php" class="btn btn-forest btn-sm rounded-pill flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1">
+                                <i class="bi bi-envelope-open"></i> Messages <?php if ($adminUnreadMsgCount > 0): ?><span class="badge bg-danger rounded-pill ms-1"><?= $adminUnreadMsgCount; ?></span><?php endif; ?>
+                            </a>
+                            <a href="<?= BASE_URL; ?>/admin/settings.php" class="btn btn-outline-forest btn-sm rounded-pill" title="Update Contact Settings">
+                                <i class="bi bi-gear"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 <a href="<?= BASE_URL; ?>/index.php" target="_blank" class="btn btn-outline-forest btn-sm rounded-pill d-none d-sm-inline-flex align-items-center gap-1">
                     <i class="bi bi-globe"></i> View Live Site
                 </a>

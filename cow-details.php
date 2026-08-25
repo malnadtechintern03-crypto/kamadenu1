@@ -42,27 +42,6 @@ $healthClass = match($cow['health_status']) {
 $ageFormatted = calculate_cow_age($cow['date_of_birth']);
 ?>
 
-
-<?php if (is_logged_in() && has_role(['super_admin', 'admin', 'manager', 'editor'])): ?>
-<!-- Admin Quick Bar for Logged-in Admins -->
-<div class="bg-forest-dark text-white py-2 border-bottom border-warning border-opacity-25 sticky-top shadow-sm" style="z-index: 1020;">
-    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-2 small">
-            <span class="badge bg-gold text-forest-dark fw-bold"><i class="bi bi-shield-lock-fill me-1"></i> Admin Panel Access</span>
-            <span class="text-cream opacity-90">Viewing Cow: <strong><?= e($cow['name']); ?></strong> (<span class="font-monospace text-gold"><?= e($cow['cow_code']); ?></span>)</span>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <a href="<?= ADMIN_URL; ?>/cow-edit.php?id=<?= $cow['id']; ?>" class="btn btn-gold btn-sm rounded-pill px-3 fw-bold shadow-xs">
-                <i class="bi bi-pencil-square me-1"></i> Edit This Cow in Admin Panel
-            </a>
-            <a href="<?= ADMIN_URL; ?>/cows.php" class="btn btn-outline-light btn-sm rounded-pill px-3">
-                <i class="bi bi-grid me-1"></i> Cows Directory
-            </a>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
 <!-- Main Cow Profile Section -->
 <section class="py-5 bg-white">
     <div class="container py-3">
@@ -148,11 +127,6 @@ $ageFormatted = calculate_cow_age($cow['date_of_birth']);
                             <span class="badge bg-forest text-white px-2 py-1 rounded-pill small"><i class="bi bi-star-fill me-1"></i> Featured Resident</span>
                         <?php endif; ?>
                     </div>
-                    <?php if (is_logged_in() && has_role(['super_admin', 'admin', 'manager', 'editor'])): ?>
-                    <a href="<?= ADMIN_URL; ?>/cow-edit.php?id=<?= $cow['id']; ?>" class="btn btn-outline-forest btn-sm rounded-pill px-3 fw-bold">
-                        <i class="bi bi-pencil-square me-1"></i> Edit Cow (Admin)
-                    </a>
-                    <?php endif; ?>
                 </div>
 
                 <h1 class="display-5 font-serif text-forest-dark fw-bold mb-3"><?= e($cow['name']); ?></h1>
@@ -181,17 +155,17 @@ $ageFormatted = calculate_cow_age($cow['date_of_birth']);
 
                     <div class="d-grid gap-2">
                         <a href="<?= BASE_URL; ?>/adopt.php?cow_id=<?= $cow['id']; ?>" class="btn btn-gold btn-lg rounded-pill py-3 fw-bold">
-                            <i class="bi bi-suit-heart-fill me-2"></i> Adopt <?= e($cow['name']); ?> (Monthly Guardian)
+                            <i class="bi bi-suit-heart-fill me-2"></i> Adopt <?= e($cow['name']); ?>
                         </a>
                         <div class="row g-2 pt-1">
                             <div class="col-6">
-                                <a href="<?= BASE_URL; ?>/donate.php?cow_id=<?= $cow['id']; ?>&purpose=Feed+<?= urlencode($cow['name']); ?>&amount=501" class="btn btn-outline-gold btn-sm w-100 rounded-pill py-2">
-                                    <i class="bi bi-flower1 me-1"></i> Feed for 1 Day (₹501)
+                                <a href="<?= BASE_URL; ?>/donate.php?cow_id=<?= $cow['id']; ?>&purpose=Feed+<?= urlencode($cow['name']); ?>" class="btn btn-outline-gold btn-sm w-100 rounded-pill py-2">
+                                    <i class="bi bi-flower1 me-1"></i> Feed the Cow
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="<?= BASE_URL; ?>/donate.php?cow_id=<?= $cow['id']; ?>&purpose=Medical+Kit+for+<?= urlencode($cow['name']); ?>&amount=1001" class="btn btn-outline-gold btn-sm w-100 rounded-pill py-2">
-                                    <i class="bi bi-bandaid me-1"></i> Medical Kit (₹1,001)
+                                <a href="<?= BASE_URL; ?>/donate.php?cow_id=<?= $cow['id']; ?>&purpose=Medical+Kit+for+<?= urlencode($cow['name']); ?>" class="btn btn-outline-gold btn-sm w-100 rounded-pill py-2">
+                                    <i class="bi bi-bandaid me-1"></i> Medical Kit
                                 </a>
                             </div>
                         </div>

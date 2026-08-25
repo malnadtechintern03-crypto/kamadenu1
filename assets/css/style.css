@@ -307,6 +307,32 @@ img {
   z-index: 1030;
 }
 
+.site-topbar {
+  background: linear-gradient(135deg, #0b2225 0%, #102F32 100%) !important;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  z-index: 1040;
+  position: relative;
+}
+
+.site-topbar a {
+  transition: color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.site-topbar a:hover,
+.hover-gold:hover {
+  color: var(--color-accent) !important;
+}
+
+.hover-forest:hover {
+  color: var(--color-secondary) !important;
+}
+
+.extra-small {
+  font-size: 0.72rem !important;
+}
+
 .heritage-navbar.scrolled {
   background: linear-gradient(135deg, rgba(16, 47, 50, 0.98) 0%, rgba(31, 82, 87, 0.98) 100%) !important;
   backdrop-filter: blur(12px);
@@ -451,6 +477,44 @@ img {
   background-color: rgba(233, 120, 58, 0.18);
   font-weight: 600;
   border-bottom: 2px solid var(--color-accent);
+}
+
+/* Primary Pinned Navbar CTA Button */
+.navbar-cta-wrapper {
+  display: flex;
+  align-items: center;
+  z-index: 5;
+}
+
+.navbar-donate-btn {
+  font-family: var(--font-heading) !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.03em;
+  padding: 0.46rem 1.25rem !important;
+  background: var(--color-accent) !important;
+  color: var(--color-white) !important;
+  border-radius: var(--radius-pill) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 4px 16px rgba(233, 120, 58, 0.38) !important;
+  transition: all 0.25s ease !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none !important;
+}
+
+.navbar-donate-btn:hover {
+  background: var(--color-secondary) !important;
+  border-color: var(--color-accent) !important;
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 6px 22px rgba(31, 82, 87, 0.45) !important;
+  color: var(--color-white) !important;
+}
+
+.navbar-donate-btn.btn-donate-active {
+  background: linear-gradient(135deg, #E9783A 0%, #D46224 100%) !important;
+  border-color: #FFF9F0 !important;
+  box-shadow: 0 0 0 3px rgba(233, 120, 58, 0.4), 0 4px 18px rgba(233, 120, 58, 0.5) !important;
 }
 
 .dropdown-menu-heritage {
