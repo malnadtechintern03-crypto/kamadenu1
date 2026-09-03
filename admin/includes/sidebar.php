@@ -77,8 +77,19 @@ $siteName = get_setting('site_name', 'Kamadenu Goushala');
         <a href="<?= BASE_URL; ?>/admin/products.php" class="admin-nav-link <?= $isActive('products.php') ? 'active' : ''; ?>" title="Products Catalog">
             <i class="bi bi-box-seam"></i> <span>Products Catalog</span>
         </a>
-        <a href="<?= BASE_URL; ?>/admin/orders.php" class="admin-nav-link <?= $isActive('orders.php') || $isActive('order-details.php') ? 'active' : ''; ?>" title="Customer Orders">
-            <i class="bi bi-bag-check"></i> <span>Customer Orders</span>
+        <?php
+        $sidebarPendingOrders = 0;
+        try {
+            $sidebarPendingOrders = (int)Database::fetchColumn("SELECT COUNT(*) FROM orders WHERE order_status = 'placed'");
+        } catch (Throwable $e) {}
+        ?>
+        <a href="<?= BASE_URL; ?>/admin/orders.php" class="admin-nav-link d-flex align-items-center justify-content-between <?= $isActive('orders.php') || $isActive('order-details.php') ? 'active' : ''; ?>" title="Customer Orders">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-bag-check"></i> <span>Customer Orders</span>
+            </div>
+            <?php if ($sidebarPendingOrders > 0): ?>
+                <span class="badge bg-warning text-dark rounded-pill px-2 py-0 extra-small"><?= $sidebarPendingOrders; ?> new</span>
+            <?php endif; ?>
         </a>
 
         <div class="px-4 pt-3 pb-1 small text-uppercase tracking-wider text-muted extra-small fw-bold sidebar-section-title">Finance & Inquiries</div>

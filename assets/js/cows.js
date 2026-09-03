@@ -36,7 +36,8 @@ function initCowFilterTabs() {
       `;
 
       try {
-        let url = `${window.location.origin}/kamadenu1/ajax/cows.php?limit=8`;
+        const baseUrl = window.BASE_URL || (window.location.origin + (window.location.pathname.startsWith('/kamadenu1') ? '/kamadenu1' : ''));
+        let url = `${baseUrl}/ajax/cows.php?limit=8`;
         if (breedVal && breedVal !== 'all') {
           url += `&breed=${encodeURIComponent(breedVal)}`;
         }
@@ -49,7 +50,7 @@ function initCowFilterTabs() {
 
         if (data.success && data.cows.length > 0) {
           container.innerHTML = data.cows.map(cow => `
-            <div class="col-md-6 col-lg-3">
+            <div class="col-sm-6 col-lg-3">
               <div class="heritage-card h-100 d-flex flex-column">
                 <div class="cow-image-wrapper">
                   <img
@@ -59,7 +60,7 @@ function initCowFilterTabs() {
                     loading="lazy"
                     width="600"
                     height="450"
-                    onerror="this.onerror=null;this.src='${window.location.origin}/kamadenu1/assets/images/placeholder-cow.jpg';"
+                    onerror="this.onerror=null;this.src='${baseUrl}/assets/images/placeholder-cow.jpg';"
                   >
                   <span class="position-absolute top-0 end-0 m-3 badge ${cow.health_class} badge-heritage">
                     ${cow.health_status}

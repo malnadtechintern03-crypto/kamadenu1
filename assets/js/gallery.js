@@ -2,13 +2,13 @@
  * KAMADENU GOUSHALA - GALLERY MASONRY & LIGHTBOX CONTROLLER
  */
 
+window.currentGalleryList = window.currentGalleryList || [];
+let currentLightboxIndex = 0;
+
 document.addEventListener('DOMContentLoaded', () => {
   initGalleryTabs();
   initLightbox();
 });
-
-let currentGalleryList = [];
-let currentLightboxIndex = 0;
 
 function initGalleryTabs() {
   const tabs = document.querySelectorAll('[data-gallery-filter]');
@@ -26,6 +26,7 @@ function initGalleryTabs() {
       this.classList.remove('btn-outline-forest');
 
       const catSlug = this.getAttribute('data-gallery-filter');
+      const baseUrl = window.BASE_URL || '';
 
       container.innerHTML = `
         <div class="col-12 text-center py-5">
@@ -35,16 +36,16 @@ function initGalleryTabs() {
       `;
 
       try {
-        const url = `ajax/gallery.php?category=${encodeURIComponent(catSlug)}`;
+        const url = `${baseUrl}/ajax/gallery.php?category=${encodeURIComponent(catSlug)}`;
         const res = await fetch(url);
         const data = await res.json();
 
         if (data.success && data.gallery.length > 0) {
-          currentGalleryList = data.gallery;
+          window.currentGalleryList = data.gallery;
           container.innerHTML = data.gallery.map((item, index) => `
             <div class="col-sm-6 col-lg-4 gallery-card-col">
               <div class="gallery-item cursor-pointer" onclick="openLightbox(${index})">
-                <img src="${item.image_path}" alt="${item.title}" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='assets/images/placeholder-gallery.jpg';">
+                <img src="${item.image_path}" alt="${item.title}" class="w-100 h-100 object-fit-cover d-block" onerror="this.onerror=null;this.src='${baseUrl}/assets/images/placeholder-gallery.jpg';">
                 <div class="gallery-overlay">
                   <span class="badge bg-gold text-forest-dark mb-1 align-self-start small">${item.category_name}</span>
                   <h4 class="h6 text-white mb-0">${item.title}</h4>
@@ -64,6 +65,11 @@ function initGalleryTabs() {
         }
       } catch (err) {
         console.error('Gallery loading error:', err);
+        container.innerHTML = `
+          <div class="col-12 text-center py-4">
+            <div class="alert alert-danger d-inline-block">Failed to load gallery images. Please try again.</div>
+          </div>
+        `;
       }
     });
   });
@@ -82,7 +88,8 @@ function initLightbox() {
 }
 
 function openLightbox(index) {
-  if (!currentGalleryList || !currentGalleryList[index]) return;
+  const list = window.currentGalleryList || [];
+  if (!list || !list[index]) return;
   currentLightboxIndex = index;
   renderLightboxContent();
 
@@ -94,7 +101,8 @@ function openLightbox(index) {
 }
 
 function renderLightboxContent() {
-  const item = currentGalleryList[currentLightboxIndex];
+  const list = window.currentGalleryList || [];
+  const item = list[currentLightboxIndex];
   if (!item) return;
 
   const titleEl = document.getElementById('lightboxTitle');
@@ -112,7 +120,9 @@ function renderLightboxContent() {
 }
 
 function nextLightbox() {
-  if (currentLightboxIndex < currentGalleryList.length - 1) {
+  const list = window.currentGalleryList || [];
+  if (list.length === 0) return;
+  if (currentLightboxIndex < list.length - 1) {
     currentLightboxIndex++;
   } else {
     currentLightboxIndex = 0;
@@ -121,10 +131,18 @@ function nextLightbox() {
 }
 
 function prevLightbox() {
+  const list = window.currentGalleryList || [];
+  if (list.length === 0) return;
   if (currentLightboxIndex > 0) {
     currentLightboxIndex--;
   } else {
-    currentLightboxIndex = currentGalleryList.length - 1;
+    currentLightboxIndex = list.length - 1;
   }
   renderLightboxContent();
 }
+
+// Ensure global accessibility for inline event handlers
+window.openLightbox = openLightbox;
+window.nextLightbox = nextLightbox;
+window.prevLightbox = prevLightbox;
+

@@ -13,4 +13,4 @@ Disallow: /ajax/
 Disallow: /database/
 
 # Sitemap Location
-Sitemap: http://localhost/kamadenu1/sitemap.php
+Sitemap: /sitemap.php

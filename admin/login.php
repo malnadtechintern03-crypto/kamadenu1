@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Bootstrap 5.3 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="<?= ASSETS_URL; ?>/css/style.css">
+    <link rel="stylesheet" href="<?= ASSETS_URL; ?>/css/style.css?v=<?= APP_VERSION; ?>">
 </head>
 <body class="min-vh-100 d-flex align-items-center justify-content-center py-5" style="background: linear-gradient(135deg, #102F32 0%, #1F5257 100%);">
 

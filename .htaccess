@@ -2,12 +2,12 @@
 # KAMADENU GOUSHALA - APACHE CONFIGURATION & CLEAN URL REWRITING
 # ==============================================================================
 
-Options -Indexes +FollowSymLinks
+Options -Indexes
 DirectoryIndex index.php index.html
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /kamadenu1/
+    # RewriteBase is omitted so rules work seamlessly in both root (InfinityFree htdocs) and subfolders
 
     # Block access to hidden files and sensitive directories
     RewriteRule ^(\.git|\.env|config|logs)/ - [F,L]
@@ -46,6 +46,12 @@ DirectoryIndex index.php index.html
     RewriteRule ^blog/([a-zA-Z0-9_-]+)/?$ blog-details.php?slug=$1 [L,QSA]
     RewriteRule ^contact/?$ contact.php [L,QSA]
     RewriteRule ^about/?$ about.php [L,QSA]
+</IfModule>
+
+# Ensure correct MIME types for CSS and JS
+<IfModule mod_mime.c>
+    AddType text/css .css
+    AddType application/javascript .js
 </IfModule>
 
 # Security Headers

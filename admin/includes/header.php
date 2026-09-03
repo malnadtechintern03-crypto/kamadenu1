@@ -32,7 +32,7 @@ $pageTitle = $pageTitle ?? 'Admin Dashboard';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- Admin Styles -->
-    <link rel="stylesheet" href="<?= ASSETS_URL; ?>/css/style.css">
+    <link rel="stylesheet" href="<?= ASSETS_URL; ?>/css/style.css?v=<?= APP_VERSION; ?>">
     <style>
         :root {
             --admin-sidebar-width: 260px;

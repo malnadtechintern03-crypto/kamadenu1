@@ -10,8 +10,8 @@ require_once dirname(__DIR__) . '/config/app.php';
 // Dynamic SEO Variables
 $pageTitle = isset($pageTitle) ? $pageTitle . ' | ' . get_setting('site_name', 'Kamadenu Goushala') : get_setting('site_name', 'Kamadenu Goushala') . ' – ' . get_setting('site_tagline', 'Vedic Cow Sanctuary');
 $metaDescription = $metaDescription ?? 'Kamadenu Goushala is dedicated to the rescue, loving care, and lifelong sanctuary of sacred indigenous Indian cows (Bos Indicus). 80G Tax Exempted.';
-$canonicalUrl = $canonicalUrl ?? (BASE_URL . ($_SERVER['REQUEST_URI'] ?? ''));
-$ogImage = $ogImage ?? (ASSETS_URL . '/images/og_banner.jpg');
+$canonicalUrl = $canonicalUrl ?? ((is_https() ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'localhost') . ($_SERVER['REQUEST_URI'] ?? ''));
+$ogImage = $ogImage ?? (BASE_URL . '/assets/images/og_banner.jpg');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,7 +44,13 @@ $ogImage = $ogImage ?? (ASSETS_URL . '/images/og_banner.jpg');
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <!-- Master Heritage Design System -->
-    <link rel="stylesheet" href="<?= ASSETS_URL; ?>/css/style.css">
+    <link rel="stylesheet" href="<?= ASSETS_URL; ?>/css/style.css?v=<?= APP_VERSION; ?>">
+    
+    <!-- Global Client Configuration -->
+    <script>
+        window.BASE_URL = <?= json_encode(BASE_URL); ?>;
+        window.ASSETS_URL = <?= json_encode(ASSETS_URL); ?>;
+    </script>
 </head>
 <body>
 

@@ -81,11 +81,11 @@ $galleryItems = Database::fetchAll("
                 <span class="badge bg-gold text-forest-dark" id="lightboxCategory">Sanctuary Gallery</span>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4 text-center">
-                <div class="rounded-3 bg-black bg-opacity-50 d-flex align-items-center justify-content-center mx-auto mb-3 overflow-hidden" style="min-height: 300px; max-height: 480px;">
+            <div class="modal-body p-3 p-md-4 text-center">
+                <div class="rounded-3 bg-black bg-opacity-50 d-flex align-items-center justify-content-center mx-auto mb-3 overflow-hidden" style="min-height: 220px; max-height: 65vh;">
                     <img src="" id="lightboxImg" class="w-100 h-100 object-fit-contain" alt="">
                 </div>
-                <h3 class="h4 font-serif text-cream mb-1" id="lightboxTitle">Goushala Moment</h3>
+                <h3 class="h5 h4-md font-serif text-cream mb-1" id="lightboxTitle">Goushala Moment</h3>
                 <p class="small text-cream opacity-75 mb-0" id="lightboxCaption">Description of the moment</p>
             </div>
             <div class="modal-footer border-0 pt-0 justify-content-between">
@@ -102,7 +102,7 @@ $galleryItems = Database::fetchAll("
 
 <script>
 // Initial payload for client lightbox
-currentGalleryList = <?= json_encode(array_map(function($i) {
+window.currentGalleryList = <?= json_encode(array_map(function($i) {
     $img = !empty($i['image_path'])
         ? (str_starts_with($i['image_path'], 'assets/') ? BASE_URL . '/' . ltrim($i['image_path'], '/') : image_url($i['image_path'], 'gallery', 'placeholder-gallery.jpg'))
         : BASE_URL . '/assets/images/placeholder-gallery.jpg';

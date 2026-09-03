@@ -97,7 +97,7 @@ function require_role(string|array $roles, ?string $redirectUrl = null): void {
         <head>
             <meta charset="UTF-8">
             <title>403 Access Denied - Kamadenu Goushala</title>
-            <link rel="stylesheet" href="' . ASSETS_URL . '/css/style.css">
+            <link rel="stylesheet" href="' . ASSETS_URL . '/css/style.css?v=' . APP_VERSION . '">
         </head>
         <body class="bg-cream d-flex align-items-center justify-content-center min-vh-100 p-4">
             <div class="card p-5 shadow-lg border-0 rounded-4 text-center max-w-500">

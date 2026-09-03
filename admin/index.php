@@ -22,6 +22,7 @@ $totalAdoptionsCount = (int)Database::fetchColumn("SELECT COUNT(*) FROM adoption
 
 $totalStoreRevenue = (float)Database::fetchColumn("SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE payment_status = 'paid'");
 $totalOrdersCount = (int)Database::fetchColumn("SELECT COUNT(*) FROM orders");
+$placedOrdersCount = (int)Database::fetchColumn("SELECT COUNT(*) FROM orders WHERE order_status = 'placed'");
 
 $unreadMessages = (int)Database::fetchColumn("SELECT COUNT(*) FROM contact_messages WHERE is_read = 0");
 $lowStockProducts = Database::fetchAll("SELECT * FROM products WHERE stock_quantity <= 10 AND is_active = 1 LIMIT 5");
@@ -36,11 +37,12 @@ $recentDonations = Database::fetchAll("
 ");
 
 $recentOrders = Database::fetchAll("
-    SELECT o.*, c.name AS customer_name 
+    SELECT o.*, c.name AS customer_name, c.phone AS customer_phone,
+           (SELECT GROUP_CONCAT(CONCAT(oi.quantity, 'x ', oi.product_name) SEPARATOR ', ') FROM order_items oi WHERE oi.order_id = o.id) AS items_summary
     FROM orders o 
     JOIN customers c ON o.customer_id = c.id 
     ORDER BY o.created_at DESC 
-    LIMIT 5
+    LIMIT 6
 ");
 
 $recentMessages = Database::fetchAll("
@@ -370,46 +372,55 @@ $dashboardCowImage = !empty($matriarchCow['main_image'])
         </div>
     </div>
 
-    <!-- Right Column: Recent E-Store Orders -->
+    <!-- Right Column: Customer Store Orders Hub & Quick Actions -->
     <div class="col-lg-6">
-        <div class="card p-4 rounded-4 border-0 shadow-sm bg-white h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h6 font-serif text-forest-dark mb-0"><i class="bi bi-bag-check text-gold me-2"></i> Recent Organic Store Orders</h2>
-                <a href="<?= BASE_URL; ?>/admin/orders.php" class="small text-forest fw-semibold">View All <i class="bi bi-arrow-right"></i></a>
+        <div class="card p-4 rounded-4 border-0 shadow-sm bg-white h-100 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h6 font-serif text-forest-dark mb-0"><i class="bi bi-bag-check text-gold me-2"></i> Customer Store Orders</h2>
+                    <a href="<?= BASE_URL; ?>/admin/orders.php" class="btn btn-gold btn-xs rounded-pill px-3 py-1 fw-bold shadow-xs">
+                        Open Orders Page <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+
+                <p class="text-muted small mb-3">
+                    All incoming customer product orders, person contact information, and administrator order confirmation controls are organized separately in the dedicated <strong>Customer Orders</strong> section.
+                </p>
+
+                <!-- Order Status Metrics Grid -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="p-3 rounded-3 bg-cream-soft border border-warning border-opacity-40">
+                            <span class="text-muted extra-small d-block fw-bold text-uppercase">Awaiting Confirmation</span>
+                            <div class="d-flex align-items-center justify-content-between mt-1">
+                                <span class="fs-4 font-serif text-warning fw-bold"><?= $placedOrdersCount ?? 0; ?></span>
+                                <a href="<?= BASE_URL; ?>/admin/orders.php?status=placed" class="badge bg-warning text-dark rounded-pill text-decoration-none extra-small">
+                                    Review <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded-3 bg-cream-soft border border-success border-opacity-30">
+                            <span class="text-muted extra-small d-block fw-bold text-uppercase">Total Orders Placed</span>
+                            <div class="d-flex align-items-center justify-content-between mt-1">
+                                <span class="fs-4 font-serif text-forest-dark fw-bold"><?= $totalOrdersCount; ?></span>
+                                <a href="<?= BASE_URL; ?>/admin/orders.php" class="badge bg-forest text-white rounded-pill text-decoration-none extra-small">
+                                    View All <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-sm table-hover align-middle mb-0 small">
-                    <thead class="bg-cream-soft">
-                        <tr>
-                            <th>Order #</th>
-                            <th>Customer</th>
-                            <th>Status</th>
-                            <th class="text-end">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recentOrders as $o): 
-                            $statusClass = match($o['order_status']) {
-                                'delivered'  => 'bg-success',
-                                'dispatched' => 'bg-info text-dark',
-                                'processing' => 'bg-warning text-dark',
-                                default      => 'bg-secondary'
-                            };
-                        ?>
-                        <tr>
-                            <td>
-                                <a href="<?= BASE_URL; ?>/admin/order-details.php?id=<?= $o['id']; ?>" class="fw-bold text-forest text-decoration-none">
-                                    <?= e($o['order_number']); ?>
-                                </a>
-                            </td>
-                            <td><?= e($o['customer_name']); ?></td>
-                            <td><span class="badge <?= $statusClass; ?> rounded-pill small"><?= ucfirst($o['order_status']); ?></span></td>
-                            <td class="text-end font-serif fw-bold text-forest-dark"><?= format_inr($o['total_amount']); ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <div class="pt-3 border-top mt-auto d-flex align-items-center justify-content-between">
+                <span class="small text-muted">
+                    <i class="bi bi-check-circle-fill text-success me-1"></i> Dedicated Orders & Fulfillments Hub
+                </span>
+                <a href="<?= BASE_URL; ?>/admin/orders.php" class="btn btn-outline-forest btn-sm rounded-pill px-3">
+                    <i class="bi bi-bag-check me-1"></i> View All Store Orders
+                </a>
             </div>
         </div>
     </div>
